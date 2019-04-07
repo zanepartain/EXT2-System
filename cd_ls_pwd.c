@@ -158,14 +158,27 @@ int ls_dir(MINODE *mip){
 }
 
 
+/*
+This func. is called when user enters 'ls (pathname)'
+*/
 int list_file()
 {
+  int ino,pino;
   printf("list_file(): \n");
 
-  int ino = getino(pathname);
-  MINODE *mip = iget(dev, ino);
+  //set ino to running CWD inode#
+  //or specified pathname inode#
+  if(strlen(pathname) == 0)
+  {
+    ino = get_myino(running->cwd,&pino);
+  }
+  else
+  {
+    ino = getino(pathname);
+  }
 
-  if(dir_or_file(mip) == 1){  //is DIRectory
+  MINODE *mip = iget(dev, ino);
+  if(dir_or_file(mip) == 1){       //is DIRectory
     ls_dir(mip);
   }
   else if(dir_or_file(mip) == 0){  //is FILE
