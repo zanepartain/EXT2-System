@@ -1,5 +1,5 @@
 /************* mkdir_rmdir.c file **************/
-#include "type.h"
+
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
 extern MINODE *root;
@@ -39,6 +39,8 @@ int dirname_basename(char *dirname, char *basename){
     return basename;
 }
 
+
+
 int make_directory(){
     char dirname[120] = {""}, basename[120] = {""};
     int pino;
@@ -48,7 +50,18 @@ int make_directory(){
 
     dirname_basename(dirname,basename);  //get basname and dirname
 
-    pino = getino(dirname);  //get parent inode#
+    /** get parent inode# */
+    if(strlen(dirname) == 0)
+    {
+        //get cwd inode#
+        get_myino(running->cwd,&pino); 
+    }
+    else
+    {
+        //get parent inode# from dirname 
+        pino = getino(dirname);        
+    }
+
     pmip = iget(dev,pino);   //get parent MINODE
 
     //parent MINODE is a DIR
