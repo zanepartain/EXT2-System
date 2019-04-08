@@ -9,10 +9,10 @@ typedef struct ext2_inode       INODE;
 typedef struct ext2_dir_entry_2 DIR;
 #define BLKSIZE  1024
 
-SUPER *sp;
-GD    *gp;
-INODE *ip;
-DIR   *dp;   
+SUPER  *sp;
+GD     *gp;
+INODE  *ip;
+DIR    *dp;   
 
 //Default dir and regular file modes
 #define DIR_MODE     0x41ED
@@ -69,3 +69,5 @@ typedef struct mtable{
   char devName[64];     //device name
   char mntName[64];     //mount point DIR name
 }MTABLE;
+
+MTABLE *mp;

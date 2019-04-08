@@ -57,7 +57,7 @@ int init()
     for (j=0; j<NFD; j++)
       p->fd[j] = 0;
   }
-  for(i = 0; i < NMTABLE; i++){
+  for(i = 1; i < NMTABLE; i++){
     mtp = &mtable[i];
     mtp->dev = 0;
   }
@@ -107,6 +107,15 @@ int main(int argc, char *argv[ ])
   imap = gp->bg_inode_bitmap;
   inode_start = gp->bg_inode_table;
   printf("bmp=%d imap=%d inode_start = %d\n", bmap, imap, inode_start);
+
+  //setting the root mtable fields 
+  mp = &mtable[0];   
+  mp->bmap = bmap;
+  mp->imap = imap;
+  mp->iblock = inode_start;
+  mp->ninodes = ninodes;
+  mp->nblocks = nblocks;
+  mp->dev = dev;
 
   init();  
   mount_root();
