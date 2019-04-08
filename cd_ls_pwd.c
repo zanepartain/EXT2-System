@@ -25,7 +25,7 @@ will determine if the MINODE is pointing to a DIR or FILE
 */
 int dir_or_file(MINODE *mip){  
   int type = -1;
-
+  
   if ((mip->INODE.i_mode & 0xF000) == 0x8000) // if (S_ISREG())
   {
     type = 0;

@@ -27,6 +27,7 @@ char   line[256], cmd[32], pathname[256];
 
 #include "util.c"
 #include "cd_ls_pwd.c"
+#include "mkdir_rmdir.c"
 
 
 int init()
@@ -130,6 +131,8 @@ int main(int argc, char *argv[ ])
        change_dir();
     if (strcmp(cmd, "pwd")==0)
        pwd(running->cwd);
+    if (strcmp(cmd,"mkdir")==0)
+       make_directory();
 
     if (strcmp(cmd, "quit")==0)
        quit();
