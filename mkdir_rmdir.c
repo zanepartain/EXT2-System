@@ -1,5 +1,5 @@
 /************* mkdir_rmdir.c file **************/
-
+#include "type.h"
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
 extern MINODE *root;
@@ -41,11 +41,29 @@ int dirname_basename(char *dirname, char *basename){
 
 int make_directory(){
     char dirname[120] = {""}, basename[120] = {""};
+    int pino;
+    MINODE *pmip;
 
     tokenize(pathname);  //tokenize pathname
 
     dirname_basename(dirname,basename);  //get basname and dirname
 
-    printf("basename = %s\t",basename);
-    printf("dirname = %s\n",dirname);
+    pino = getino(dirname);  //get parent inode#
+    pmip = iget(dev,pino);   //get parent MINODE
+
+    //parent MINODE is a DIR
+    if(dir_or_file(pmip) == 1){
+        if(search(pmip,basename) == 0){
+            //basename does not exist
+            printf("basename = %s ; DOES NOT EXIST\t",basename);
+            printf("dirname = %s \n",dirname);
+        }
+        else{
+            //basename already exists
+            printf("basename = %s ; ALREADY EXISTS\t",basename);
+            printf("dirname = %s \n",dirname);
+        }
+    }
+
+    
 }

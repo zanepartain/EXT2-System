@@ -73,6 +73,7 @@ int main(int argc, char *argv[ ])
   if (argc > 1)
     disk = argv[1];
 
+
   printf("checking EXT2 FS ....");
   if ((fd = open(disk, O_RDWR)) < 0){
     printf("open %s failed\n", disk);  exit(1);
