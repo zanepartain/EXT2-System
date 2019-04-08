@@ -16,6 +16,17 @@ extern char   line[256], cmd[32], pathname[256];
 #define OTHER  000007
 
 /**
+ * Test and Set bits in buf 
+ */
+int test_bit(char *buf, int bit){
+    return buf[bit/8] & (1 << (bit % 8));
+}
+int set_bit(char *buf, int bit){
+    buf[bit/8] |= (1 << (bit % 8));
+}
+
+
+/**
  * Divides the path into dirname and basename. Returns basename
  */
 int dirname_basename(char *dirname, char *basename){
@@ -40,7 +51,10 @@ int dirname_basename(char *dirname, char *basename){
 }
 
 
-
+/**
+* Makes a new child DIR inside of the specified parent DIR.
+* (iff parent DIR exists)
+*/
 int make_directory(){
     char dirname[120] = {""}, basename[120] = {""};
     int pino;
@@ -62,7 +76,7 @@ int make_directory(){
         pino = getino(dirname);        
     }
 
-    pmip = iget(dev,pino);   //get parent MINODE
+    pmip = iget(dev,pino);  //get parent MINODE
 
     //parent MINODE is a DIR
     if(dir_or_file(pmip) == 1){
@@ -77,6 +91,5 @@ int make_directory(){
             printf("dirname = %s \n",dirname);
         }
     }
-
-    
 }
+
