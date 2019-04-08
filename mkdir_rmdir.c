@@ -27,6 +27,51 @@ int set_bit(char *buf, int bit){
 
 
 /**
+* Decrement or increment the free blocks count in both the
+* SUPER block and GROUP_DESCRIPTOR block.
+*/
+int dec_inc_freeINODES(int dev, char action){
+    char   buf[BLKSIZE];
+    SUPER *super;
+    GD    *group_descriptor;
+
+    get_block(dev,1,buf);  //get super block
+    super = (SUPER *)buf;
+
+    switch (action)
+    {
+        case '+':
+            //put super block
+            super->s_free_blocks_count++;
+            put_block(dev,1,buf);
+            
+            //get and put group descriptor block
+            get_block(dev,2,buf);  
+            group_descriptor = (GD *)buf;
+            group_descriptor->bg_free_blocks_count++;
+            put_block(dev,2,buf);
+            break;
+
+        case '-':
+            //put super block
+            super->s_free_blocks_count--;
+            put_block(dev,1,buf);
+            
+            //get and put group descriptor block
+            get_block(dev,2,buf);  
+            group_descriptor = (GD *)buf;
+            group_descriptor->bg_free_blocks_count--;
+            put_block(dev,2,buf);
+            break;
+
+        default:
+            printf("_err: Invalid action ; dec_inc_freeINODES");
+            break;
+    }
+}
+
+
+/**
  * Divides the path into dirname and basename. Returns basename
  */
 int dirname_basename(char *dirname, char *basename){
