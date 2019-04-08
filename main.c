@@ -13,9 +13,11 @@
 
 #include "type.h"
 
-MINODE minode[NMINODE];
-MINODE *root;
-PROC   proc[NPROC], *running;
+//GLOBALS
+MINODE minode[NMINODE];         //in memory INODES
+MTABLE mtable[NMTABLE];         //mount tables
+MINODE *root;                   //root MINODE
+PROC   proc[NPROC], *running;   //PROC structs, current executing PROC
 
 char   gpath[256]; // global for tokenized components
 char   *name[64];  // assume at most 64 components in pathname
@@ -34,6 +36,7 @@ int init()
 {
   int i, j;
   MINODE *mip;
+  MTABLE *mtp;
   PROC   *p;
 
   printf("init()\n");
@@ -53,6 +56,10 @@ int init()
     p->status = FREE;
     for (j=0; j<NFD; j++)
       p->fd[j] = 0;
+  }
+  for(i = 0; i < NMTABLE; i++){
+    mtp = &mtable[i];
+    mtp->dev = 0;
   }
 }
 
@@ -85,7 +92,7 @@ int main(int argc, char *argv[ ])
   sp = (SUPER *)buf;
 
   /* verify it's an ext2 file system *****************/
-  if (sp->s_magic != 0xEF53){
+  if (sp->s_magic != SUPER_MAGIC){
       printf("magic = %x is not an ext2 filesystem\n", sp->s_magic);
       exit(1);
   }     

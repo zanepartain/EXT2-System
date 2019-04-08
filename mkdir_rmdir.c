@@ -72,6 +72,17 @@ int dec_inc_freeINODES(int dev, char action){
 
 
 /**
+ * 
+ */
+int ialloc(int dev){
+    int iter;
+    char buf[BLKSIZE];
+
+    
+}
+
+
+/**
  * Divides the path into dirname and basename. Returns basename
  */
 int dirname_basename(char *dirname, char *basename){
