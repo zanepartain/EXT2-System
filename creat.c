@@ -42,6 +42,9 @@ MINODE *create_FILE_inode(int ino,int bno,int device){
 }
 
 
+/**
+ * Create a FILE mode INODE under the parent MINODE  
+ */
 int my_creat(MINODE *pmip, char *child_name){
     int ino, bno;
     MINODE *mip;
@@ -54,6 +57,11 @@ int my_creat(MINODE *pmip, char *child_name){
     enter_name(pmip,ino,child_name);               //enter new FILE under parent MINODE
 }
 
+
+/**
+ * Client version.It will tokenize the pathname into dirname & basename. 
+ * Then iff the FILE name doesnt already exist, create the FILE under parent DIR. 
+ */
 int creat_file(){
     char dirname[120] = {""}, basename[120] = {""};
     int pino, ppino;
