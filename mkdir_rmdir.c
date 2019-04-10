@@ -254,7 +254,30 @@ int enter_name(MINODE *pmip, int ino, char *name){
             put_block(pmip->dev,ip->i_block[i],sbuf);
             iput(pmip);
 
-            return 1;
+            return;
+        }
+        else{
+            i++;
+
+            //get pmip's new data block into sbuf
+            get_block(pmip->dev,ip->i_block[i],sbuf);
+
+            dp = (DIR *)sbuf;
+
+            pmip->INODE.i_size += BLKSIZE;  //increment parent size by 1024  
+            
+            //dp points to a new empty data block  
+            dp->file_type = DIR_MODE;
+            dp->rec_len = BLKSIZE;
+            dp->name_len = strlen(name);
+            dp->inode = ino;
+            strcpy(dp->name,name);
+
+            //write the block back to the disk
+            put_block(pmip->dev,ip->i_block[i],sbuf);
+            iput(pmip);
+
+            return;
         }
     }
 }
