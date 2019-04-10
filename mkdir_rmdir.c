@@ -244,7 +244,6 @@ int enter_name(MINODE *pmip, int ino, char *name){
 
             //dp points to a new empty dir entry 
             //where we will enter the new DIR
-            dp->file_type = DIR_MODE;
             dp->rec_len = remain;
             dp->name_len = strlen(name);
             dp->inode = ino;
@@ -267,7 +266,6 @@ int enter_name(MINODE *pmip, int ino, char *name){
             pmip->INODE.i_size += BLKSIZE;  //increment parent size by 1024  
             
             //dp points to a new empty data block  
-            dp->file_type = DIR_MODE;
             dp->rec_len = BLKSIZE;
             dp->name_len = strlen(name);
             dp->inode = ino;
@@ -354,9 +352,9 @@ int my_mkdir(MINODE *pmip, char *child_name){
     printf("ino: %d\n", ino);
     printf("bno: %d\n", bno);
 
-    mip = create_DIR_inode(ino,bno,pmip->dev);      //create new inode
-    create_DIR_block(ino,pmip->ino, bno); //create new DIR block
-    enter_name(pmip, ino, child_name);    //create new INODE under pmip
+    mip = create_DIR_inode(ino,bno,pmip->dev);  //create new inode
+    create_DIR_block(ino,pmip->ino, bno);       //create new DIR block
+    enter_name(pmip, ino, child_name);          //create new INODE under pmip
 }
 
 
