@@ -15,6 +15,8 @@ extern char   line[256], cmd[32], pathname[256];
 #define GROUP  000070
 #define OTHER  000007
 
+#include "string.h"
+
 
 /**
  * Deallocate the desired INODE and BLOCK (mip)
@@ -45,7 +47,7 @@ int rm_child(MINODE *pmip, char *child_name){
     char *char_p;
     DIR *prev_dp, *cur_dp;
 
-    strcpy(dir_name,name);
+    strcpy(dir_name,child_name);
   
     for (i=0; i < 12; i++){
 
@@ -63,7 +65,7 @@ int rm_child(MINODE *pmip, char *child_name){
           strncpy(temp, dp->name, dp->name_len);   //make name a string
           temp[dp->name_len] = 0;                  //ensure null at end
           
-          if(strcmp(temp,name) == 0){  
+          if(strcmp(temp,child_name) == 0){  
             //found dir to delete
             //rec_len (except for last direntry)
             ideal_length = 4*((8 + dp->name_len + 3)/4);  
@@ -102,19 +104,20 @@ int rm_child(MINODE *pmip, char *child_name){
         //advance to next entry
         char *cp = char_p;
 
-        cp += dp->rec_len;    
+        cp += dp->rec_len;    //point to entry after dp in Block
         cur_dp = (DIR *)cp;   
         int size = 0;
 
-        //advance to last entry
+        //advance to last entry to get total size (bits)
         while(cp + cur_dp->rec_len < sbuf + BLKSIZE){
             cp += cur_dp->rec_len;    
             size += cur_dp->rec_len;
             cur_dp = (DIR *)cp; 
         }
 
-        cur_dp->rec_len += dp->rec_len;   //add extra rec_len from deleted entry
-        size += dp->rec_len;
+        cur_dp->rec_len += dp->rec_len;  // + deleted rec_len to last entry    
+        char_p += dp->rec_len;           // advance char_p to entry after dp
+        size += dp->rec_len;             // + deleted rec_len to total size (bits)
 
         memmove(dp,char_p,size); //move everything left
 
@@ -147,7 +150,15 @@ int remove_directory(){
             pmip = iget(mip->dev, pino);
             get_myname(pmip, ino, my_name);   
             
-            rm_child(pmip, my_name); //remove child DIR from parent DIR
+            rm_child(pmip, my_name);     //remove child DIR from parent DIR
+            pmip->INODE.i_links_count--; 
+            pmip->dirty = 1;
+
+            //deallocate mip (CHILD DIR)
+            bdalloc(mip->dev,mip->INODE.i_block[0]);
+            idalloc(mip->dev,mip->ino);
+            iput(mip);
+            
         }
         else{
             iput(mip);
