@@ -351,6 +351,8 @@ int balloc(int device){
 }
 
 
+
+
 /**
  * allocate a new INODE
  */
@@ -369,6 +371,46 @@ int ialloc(int device){
             return iter+1;
         }
     }
+}
+
+
+/**
+ * deallocate an existing BLOCK 
+ */
+int dballoc(int device, int bno){
+    int i;
+    char buf[BLKSIZE];
+
+    if(bno > nblocks){
+        printf("inumber %d out of range\n", bno);
+        return;
+    }
+
+    get_block(device, bmap, buf);  //get INODE bitmap block
+    clear_bit(buf, bno-1);        //clear bit
+
+    put_block(device, bmap, buf);     //write INODE back
+    dec_inc_freeBLOCKS(device, '+');  //increment free BLOCK's
+}
+
+
+/**
+ * deallocate an existing INODE 
+ */
+int idalloc(int device, int ino){
+    int i;
+    char buf[BLKSIZE];
+
+    if(ino > ninodes){
+        printf("inumber %d out of range\n", ino);
+        return;
+    }
+
+    get_block(device,imap, buf);  //get INODE bitmap block
+    clear_bit(buf, ino-1);        //clear bit
+
+    put_block(device, imap, buf);     //write INODE back
+    dec_inc_freeINODES(device, '+');  //increment free INODE's
 }
 
 

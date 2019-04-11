@@ -35,6 +35,7 @@ int remove_directory(){
     ino = getino(pathname);   //get inode#
     mip = iget(dev, ino);     //get MINODE by inode#
 
+    
     if(dir_or_file(mip) == 1 && mip->refCount == 2){
         //mip is a DIR and not BUSY
         if(child_count(mip) == 2){
@@ -48,14 +49,14 @@ int remove_directory(){
             printf("--> %s IS EMPTY\n", my_name);
         }
         else{
-            //get parent inode# and INODE
-            get_myino(mip,&pino);
-            pmip = iget(mip->dev, pino);
-
-            //get name of mip under parent DIR
-            get_myname(pmip, ino, my_name); 
-            printf("_err: %s NOT EMPTY\n", my_name);
-            return;
+            iput(mip);
+            printf("_err: DIR NOT EMPTY\n");
+            return -1;
         }
+    }
+    else{
+        iput(mip);
+        printf("_err: DIR is BUSY ; or NOT A DIR\n");
+        return -1;
     }
 }
