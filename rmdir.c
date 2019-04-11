@@ -15,3 +15,7 @@ extern char   line[256], cmd[32], pathname[256];
 #define GROUP  000070
 #define OTHER  000007
 
+
+int remove_directory(){
+    return;
+}
