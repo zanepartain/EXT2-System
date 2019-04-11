@@ -217,6 +217,29 @@ int clear_bit(char *buf,int bit){
 }
 
 
+/*
+will determine if the MINODE is pointing to a DIR or FILE
+*/
+int dir_or_file(MINODE *mip){  
+  int type = -1;
+  
+  if ((mip->INODE.i_mode & 0xF000) == 0x8000) // if (S_ISREG())
+  {
+    type = 0;
+  }
+  if ((mip->INODE.i_mode & 0xF000) == 0x4000) // if (S_ISDIR())
+  {
+    type = 1;
+  }
+  if ((mip->INODE.i_mode & 0xF000) == 0xA000) // if (S_ISLNK())
+  {
+    type = 2;
+  }
+
+  return type;
+}
+
+
 /**
 * Decrement or increment the free blocks count in both the
 * SUPER block and GROUP_DESCRIPTOR block.
@@ -395,22 +418,14 @@ int enter_name(MINODE *pmip, int ino, char *name){
 
         //get pmip's data block into sbuf
         get_block(pmip->dev,ip->i_block[i],sbuf);
-        printf("i_block[%d] %d:\n",i, ip->i_block[i]);
-        printf("******************************\n");
 
         dp = (DIR *)sbuf; 
         cp = sbuf;
 
-        printf("inode# rec_len name_len name\n");
-        while(cp + dp->rec_len < sbuf + BLKSIZE){
-            //make name a string, ensure ending null
-            strncpy(temp, dp->name, dp->name_len);  
-            temp[dp->name_len] = 0;                    
-
-            printf("%4d %7d %7d\t%s\n\n", 
-            dp->inode, dp->rec_len, dp->name_len, temp);
-
-            ideal_length = 4*((8 + dp->name_len + 3)/4);  //rec_len (except for last direntry)
+        while(cp + dp->rec_len < sbuf + BLKSIZE)
+        {
+            //rec_len (except for last direntry)
+            ideal_length = 4*((8 + dp->name_len + 3)/4);  
 
             cp += dp->rec_len;  //advance char_p by rec_len
             dp = (DIR *)cp;     //pull dir_p to next entry
@@ -467,59 +482,33 @@ int enter_name(MINODE *pmip, int ino, char *name){
 
 
 /**
- * Create a new inode as a DIR
+ * Count the number of children a parent DIR has. Return the child count. 
  */
-MINODE *create_DIR_inode(int ino,int bno,int device){
-    MINODE *mip;
+int child_count(MINODE *pmip){
+    int count = 0,i;
+    char sbuf[BLKSIZE], *cp;
+    INODE *ip = &pmip->INODE;
 
-    //get MINODE and ptr to INODE
-    mip = iget(device, ino);
-    INODE *ip = &mip->INODE;
+     for(i = 0; i < 12;i++){
+        
+        if(ip->i_block[i] == 0){
+            break;
+        }
 
-    //Set INODE to new DIR
-    ip->i_mode = DIR_MODE;       //0x41ED
-    ip->i_uid  = running->uid;   //Owner uid
-    //ip->i_gid  = running->gid;
-    ip->i_size = BLKSIZE;        //1024 bits
-    ip->i_links_count = 2;       // 2links '.' and '..'
-    ip->i_atime = ip->i_ctime = ip->i_mtime = time(0L);
-    ip->i_blocks = 2;            // LINUX: Blocks count in 512-byte chunks
-    ip->i_block[0] = bno;        //new DIR has 1 data block
-    
-    for(int i = 1; i <= 14; i++)
-    {
-        ip->i_block[i] = 0;
+        //get pmip's data block into sbuf
+        get_block(pmip->dev,ip->i_block[i],sbuf);
+       
+        dp = (DIR *)sbuf; 
+        cp = sbuf;
+
+        while(cp < sbuf + BLKSIZE){                  
+            count++;
+            cp += dp->rec_len;  //advance char_p by rec_len
+            dp = (DIR *)cp;     //pull dir_p to next entry
+        }
     }
-
-    mip->dirty = 1;  //dirty MINODE
-    iput(mip);       //Write INODE back to disk
-
-    return mip;
-}
-
-
-/**
- * Create a new data block as a DIR
- */
-MINODE *create_DIR_block(int ino,int pino, int bno){
-    char buf[BLKSIZE];
-    dp = (DIR *)buf;
-
-    __bzero(buf,BLKSIZE);
-
-    //Make '.' entry in DIR block
-    dp->inode = ino;
-    dp->rec_len = 12;
-    dp->name_len = 1;
-    dp->name[0] = '.';
-
-    //Make '..' entry in DIR block
-    dp = (char *)dp + 12;
-    dp->inode = pino;
-    dp->rec_len = BLKSIZE - 12;
-    dp->name_len = 2;
-    dp->name[0] = dp->name[1]  = '.';  
-    put_block(dev, bno, buf);
+    
+    return count;
 }
 
 /*************************END MY UTILITY FUNCTIONS**********************************/

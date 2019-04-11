@@ -154,6 +154,8 @@ int main(int argc, char *argv[ ])
        make_directory();
     if (strcmp(cmd,"creat")==0)
        creat_file();
+    if (strcmp(cmd,"rmdir")==0)
+       remove_directory();
 
     if (strcmp(cmd, "quit")==0)
        quit();

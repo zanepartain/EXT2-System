@@ -21,29 +21,6 @@ extern char   line[256], cmd[32], pathname[256];
 
 
 /*
-will determine if the MINODE is pointing to a DIR or FILE
-*/
-int dir_or_file(MINODE *mip){  
-  int type = -1;
-  
-  if ((mip->INODE.i_mode & 0xF000) == 0x8000) // if (S_ISREG())
-  {
-    type = 0;
-  }
-  if ((mip->INODE.i_mode & 0xF000) == 0x4000) // if (S_ISDIR())
-  {
-    type = 1;
-  }
-  if ((mip->INODE.i_mode & 0xF000) == 0xA000) // if (S_ISLNK())
-  {
-    type = 2;
-  }
-
-  return type;
-}
-
-
-/*
 CD: Change CWD to new DIR (if DIR exists)
 */
 int change_dir()
@@ -246,7 +223,7 @@ int get_myname(MINODE *parent_mip, int my_ino, char *myname){
 
 int rpwd(MINODE *wd){
   int parent_ino, my_ino;
-  char my_name[256];
+  char my_name[120];
   MINODE *pip;
  
   if (wd == root){
