@@ -102,7 +102,7 @@ int ls_file(int ino, char *fname){
     printf(" -> %s", linkname); // print linked name
   }
   */
-
+  iput(mip);
   printf("\n");
 }
 
