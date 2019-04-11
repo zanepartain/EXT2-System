@@ -377,7 +377,7 @@ int ialloc(int device){
 /**
  * deallocate an existing BLOCK 
  */
-int dballoc(int device, int bno){
+int bdalloc(int device, int bno){
     int i;
     char buf[BLKSIZE];
 
@@ -387,10 +387,10 @@ int dballoc(int device, int bno){
     }
 
     get_block(device, bmap, buf);  //get INODE bitmap block
-    clear_bit(buf, bno-1);        //clear bit
+    clear_bit(buf, bno-1);         //clear bit
 
     put_block(device, bmap, buf);     //write INODE back
-    dec_inc_freeBLOCKS(device, '+');  //increment free BLOCK's
+    dec_inc_freeBLOCKS(device, '+');  //increment free BLOCKS
 }
 
 
