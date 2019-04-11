@@ -15,13 +15,14 @@ INODE  *ip;
 DIR    *dp;   
 
 //Default dir and regular file modes
-#define DIR_MODE     0x41ED
-#define FILE_MODE    0x81AE
-#define SUPER_MAGIC  0xEF53
-#define SUPER_USER   0
+#define DIR_MODE      0x41ED
+#define FILE_MODE     0x81AE
+#define FILE_MODE_STD 0100644
+#define SUPER_MAGIC   0xEF53
+#define SUPER_USER    0
 //PROC status
-#define FREE         0
-#define READY        1
+#define FREE          0
+#define READY         1
 
 //file system table sizes
 #define NMINODE    64

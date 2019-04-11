@@ -29,8 +29,10 @@ char   line[256], cmd[32], pathname[256];
 
 #include "util.c"
 #include "cd_ls_pwd.c"
-#include "mkdir_rmdir.c"
+#include "mkdir.c"
 #include "creat.c"
+#include "rmdir.c"
+
 
 int init()
 {

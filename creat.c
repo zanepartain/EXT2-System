@@ -27,7 +27,7 @@ MINODE *create_FILE_inode(int ino,int bno,int device){
     INODE *ip = &mip->INODE;
 
     //Set INODE to new DIR
-    ip->i_mode = FILE_MODE;        //0x81AE
+    ip->i_mode = FILE_MODE_STD;    //0100644
     ip->i_uid  = running->uid;     //Owner uid
     //ip->i_gid  = running->gid;
     ip->i_size = 0;                //no Block

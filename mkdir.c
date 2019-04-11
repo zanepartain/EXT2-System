@@ -1,4 +1,4 @@
-/************* mkdir_rmdir.c file **************/
+/************* mkdir.c file **************/
 
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
