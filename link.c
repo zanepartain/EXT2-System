@@ -81,5 +81,51 @@ int link(){
  * Delete file from parent DIR, and dec INODES link_count
  */
 int unlink(){
-    
+    int ino, pino;
+    char dirname[256], basenmae[256];
+    MINODE *mip, *pmip;
+
+    ino = getino(pathname);  //get inode# of file
+
+    if(ino != 0)  //(file Exists)
+    {
+        //get MINODE
+        mip = iget(dev,ino);
+        //(if MINODE is not a DIR)
+        if(dir_or_file(mip) != 1)  
+        {
+            dirname_basename(dirname,basenmae); //get dirname & basename of mip
+            
+            //Get parent MINODE
+            pino = getino(dirname);
+            pmip = iget(dev, pino);
+
+            //remove child file from parent MINODE
+            //mark parent as dirty & write back
+            rm_child(pmip,basenmae);
+            pmip->dirty = 1; 
+            iput(pmip);
+
+            mip->INODE.i_links_count--;
+
+            if(mip->INODE.i_links_count > 0){
+                mip->dirty = 1;
+            }
+            else{
+                //deallocate mip
+                free_INODE_BLOCK(mip);
+            }
+
+            iput(mip);
+        }
+        else
+        {
+            //MINODE is a DIR
+            printf("_err: %s ; file_to_unlink is DIR\n", name[n-1]);
+        }
+    }
+    else  //(file DNE)
+    {
+        return;
+    }
 }
