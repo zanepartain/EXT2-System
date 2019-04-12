@@ -158,7 +158,9 @@ int main(int argc, char *argv[ ])
     if (strcmp(cmd,"rmdir")==0)
        remove_directory();
     if (strcmp(cmd,"link")==0)
-       link_file();
+       link();
+    if (strcmp(cmd,"unlink")==0)
+       unlink();
 
     if (strcmp(cmd, "quit")==0)
        quit();

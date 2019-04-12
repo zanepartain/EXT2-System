@@ -20,7 +20,7 @@ extern char   line[256], cmd[32], pathname[256], sourcepath[256];
 /**
  * Hard link from the new_file (sourcepath) to old_file (pathname)
  */
-int link_file(){
+int link(){
     int old_ino, pino;
     char new_dirname[256]={""},new_basename[120]={""};  //new file dirname & basename
     MINODE *old_mip, *pmip;
@@ -73,7 +73,13 @@ int link_file(){
     else{
         return;
     }
+}
 
+
+/**
+ * Unlink the specified file (if exists).
+ * Delete file from parent DIR, and dec INODES link_count
+ */
+int unlink(){
     
-
 }
