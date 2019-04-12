@@ -25,13 +25,14 @@ int    n;          // number of component strings
 
 int    fd, dev;
 int    nblocks, ninodes, bmap, imap, inode_start;
-char   line[256], cmd[32], pathname[256];
+char   line[256], cmd[32], pathname[256], sourcepath[256];
 
 #include "util.c"
 #include "cd_ls_pwd.c"
 #include "mkdir.c"
 #include "creat.c"
 #include "rmdir.c"
+#include "link.c"
 
 
 int init()
@@ -141,7 +142,7 @@ int main(int argc, char *argv[ ])
     pathname[0] = 0;
     cmd[0] = 0;
     
-    sscanf(line, "%s %s", cmd, pathname);
+    sscanf(line, "%s %s %s", cmd, pathname,sourcepath);
     printf("cmd=%s pathname=%s\n", cmd, pathname);
 
     if (strcmp(cmd, "ls")==0)
@@ -156,6 +157,8 @@ int main(int argc, char *argv[ ])
        creat_file();
     if (strcmp(cmd,"rmdir")==0)
        remove_directory();
+    if (strcmp(cmd,"link")==0)
+       link_file();
 
     if (strcmp(cmd, "quit")==0)
        quit();

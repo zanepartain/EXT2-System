@@ -107,7 +107,7 @@ int make_directory(){
 
     tokenize(pathname);  //tokenize pathname
 
-    dirname_basename(dirname,basename);  //get basname and dirname
+    dirname_basename(dirname,basename);  //get basename and dirname
 
     /** get parent inode# */
     if(strlen(dirname) == 0)
