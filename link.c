@@ -82,7 +82,7 @@ int link(){
  */
 int unlink(){
     int ino, pino;
-    char dirname[256], basenmae[256];
+    char dirname[256] = {""}, basename[256] = {""};
     MINODE *mip, *pmip;
 
     ino = getino(pathname);  //get inode# of file
@@ -94,15 +94,15 @@ int unlink(){
         //(if MINODE is not a DIR)
         if(dir_or_file(mip) != 1)  
         {
-            dirname_basename(dirname,basenmae); //get dirname & basename of mip
-            
+            dirname_basename(dirname,basename); //get dirname & basename of mip
+
             //Get parent MINODE
             pino = getino(dirname);
             pmip = iget(dev, pino);
 
             //remove child file from parent MINODE
             //mark parent as dirty & write back
-            rm_child(pmip,basenmae);
+            rm_child(pmip,basename);
             pmip->dirty = 1; 
             iput(pmip);
 
