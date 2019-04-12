@@ -417,7 +417,7 @@ int idalloc(int device, int ino){
 /**
  * Divides the path into dirname and basename. Returns basename
  */
-int dirname_basename(char *dirname, char *basename, char* pathname){
+int dirname_basename(char *dirname, char *basename){
 
     if(n > 0){
         //set basename as last path name
