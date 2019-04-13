@@ -140,7 +140,7 @@ int remove_directory(){
     mip = iget(dev, ino);     //get MINODE by inode#
 
     //mip is a DIR, not BUSY, and EMPTY  
-    if(dir_or_file(mip) == 1 && mip->refCount == 2){
+    if(dir_or_file(mip) == 1 && mip->refCount <= 2){
         if(child_count(mip) == 2){
 
             free_INODE_BLOCK(mip); //deallocate MINODE
@@ -158,6 +158,7 @@ int remove_directory(){
             bdalloc(mip->dev,mip->INODE.i_block[0]);
             idalloc(mip->dev,mip->ino);
             iput(mip);
+            iput(pmip);
             
         }
         else{

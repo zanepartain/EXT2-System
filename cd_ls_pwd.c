@@ -161,6 +161,7 @@ int list_file()
   else if(dir_or_file(mip) == 0){  //is FILE
     //ls_file(mip);
   }
+  iput(mip);
 }
 
 

@@ -121,5 +121,6 @@ int readlink(char *file, char *buffer){
         printf("_err: %s ; NOT SYMLINK\n", basename);
     }
 
+    iput(mip);
     return mip->INODE.i_size; 
 }

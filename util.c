@@ -192,6 +192,7 @@ int getino(char *pathname)
       iput(mip);
       mip = iget(dev, ino);
    }
+   iput(mip);
    return ino;
 }
 
