@@ -145,6 +145,8 @@ int main(int argc, char *argv[ ])
     
     sscanf(line, "%s %s %s", cmd, pathname,sourcepath);
     printf("cmd=%s pathname=%s\n", cmd, pathname);
+    
+    char buf[BLKSIZE] = {""};
 
     if (strcmp(cmd, "ls")==0)
        list_file();
@@ -164,6 +166,8 @@ int main(int argc, char *argv[ ])
        unlink();
     if (strcmp(cmd,"symlink")==0)
        symlink();
+    if (strcmp(cmd,"readlink")==0)
+       readlink(pathname,buf);
 
     if (strcmp(cmd, "quit")==0)
        quit();

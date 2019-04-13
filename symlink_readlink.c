@@ -77,8 +77,9 @@ int symlink(){
  * Read target file name of a symbolic
  */
 int readlink(char *file, char *buffer){
-    int ino;
-    char dirname[256] = {""}, basename[256] = {""}; //for debug purposes
+    int ino, i;
+    char dirname[256] = {""}, basename[256] = {""}, sbuf[BLKSIZE]; //for debug purposes
+    char *cp;
     MINODE *mip;
 
     ino = getino(file);
@@ -89,8 +90,36 @@ int readlink(char *file, char *buffer){
     //verify mip is symlink
     if(dir_or_file(mip) == 2){
         printf("%s IS SYMLINK\n", basename);
+
+        //search INODE data blocks for target name
+        for(i = 0; i < 12; i ++){
+            if(mip->INODE.i_block[i] == 0){
+                continue;
+            }
+            
+            //read in current block to sbuf
+            //then get first dir entry
+            get_block(mip->dev, mip->INODE.i_block[i], sbuf);
+            dp = (DIR *)sbuf;
+            cp = sbuf;
+
+            while(cp < sbuf + BLKSIZE){
+                if(strcmp(dp->name,".") != 0 && strcmp(dp->name,"..") != 0){
+                    //copy dp name to buffer
+                    strncpy(buffer, dp->name, dp->name_len);
+                    buffer[dp->name_len] = 0;
+
+                    printf("target name = %s\n", buffer);
+                }
+
+                cp += dp->rec_len;  //advance cp & dp
+                dp = (DIR *)cp;
+            }
+        }
     }
     else{
         printf("_err: %s ; NOT SYMLINK\n", basename);
     }
+
+    return mip->INODE.i_size; 
 }

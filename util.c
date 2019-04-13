@@ -145,7 +145,7 @@ int search(MINODE *mip, char *name)
 
       while(char_p < sbuf + BLKSIZE){
           strncpy(temp, dp->name, dp->name_len);  //make name a string
-          temp[dp->name_len] = 0;                    //ensure null at end
+          temp[dp->name_len] = 0;                 //ensure null at end
           
           if(strcmp(temp,name) == 0){  //found dir, return inode number
               return dp->inode;
