@@ -33,6 +33,7 @@ char   line[256], cmd[32], pathname[256], sourcepath[256];
 #include "creat.c"
 #include "rmdir.c"
 #include "link_unlink.c"
+#include "symlink_readlink.c"
 
 
 int init()
