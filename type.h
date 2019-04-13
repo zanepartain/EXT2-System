@@ -18,6 +18,7 @@ DIR    *dp;
 #define DIR_MODE      0x41ED
 #define FILE_MODE     0x81AE
 #define FILE_MODE_STD 0100644
+#define LNK           0120777
 #define SUPER_MAGIC   0xEF53
 #define SUPER_USER    0
 //PROC status

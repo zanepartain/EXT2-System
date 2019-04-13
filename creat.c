@@ -62,7 +62,7 @@ int my_creat(MINODE *pmip, char *child_name){
  * Client version.It will tokenize the pathname into dirname & basename. 
  * Then iff the FILE name doesnt already exist, create the FILE under parent DIR. 
  */
-int creat_file(){
+int creat_file(char *pathname){
     char dirname[120] = {""}, basename[120] = {""};
     int pino, ppino;
     MINODE *pmip;

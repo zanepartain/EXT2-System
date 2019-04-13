@@ -154,13 +154,15 @@ int main(int argc, char *argv[ ])
     if (strcmp(cmd,"mkdir")==0)
        make_directory();
     if (strcmp(cmd,"creat")==0)
-       creat_file();
+       creat_file(pathname);
     if (strcmp(cmd,"rmdir")==0)
        remove_directory();
     if (strcmp(cmd,"link")==0)
        link();
     if (strcmp(cmd,"unlink")==0)
        unlink();
+    if (strcmp(cmd,"symlink")==0)
+       symlink();
 
     if (strcmp(cmd, "quit")==0)
        quit();
