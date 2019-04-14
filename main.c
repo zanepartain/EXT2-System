@@ -171,6 +171,8 @@ int main(int argc, char *argv[ ])
        readlink(pathname,buf);
     if (strcmp(cmd,"stat")==0)
        my_stat(pathname);
+    if (strcmp(cmd,"chmod")==0)
+       my_chmod(pathname);
 
     if (strcmp(cmd, "quit")==0)
        quit();

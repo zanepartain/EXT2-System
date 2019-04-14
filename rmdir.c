@@ -24,6 +24,7 @@ extern char   line[256], cmd[32], pathname[256];
 int free_INODE_BLOCK(MINODE *mip){
     for(int i = 0; i < 12; i++){
         if(mip->INODE.i_block[0] == 0){
+            
             continue;
         }
         //deallocate the BLOCK

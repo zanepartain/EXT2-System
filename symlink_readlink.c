@@ -60,6 +60,7 @@ int symlink(){
             pino = getino(new_dirname);
             new_pmip = iget(dev, pino);
             new_pmip->dirty = 1;
+
             iput(new_pmip);
 
         }

@@ -45,3 +45,21 @@ struct stat my_stat(char *filepath){
 
     return mstat;
 }
+
+
+/**
+ * change the MINODE mode to an executable file
+ */
+int my_chmod(char *filepath){
+    int ino;
+    MINODE *mip;
+
+    //get MINODE of file
+    ino = getino(filepath);
+    mip = iget(dev,ino);
+
+    mip->INODE.i_mode |=  0644;
+    mip->dirty = 1;
+
+    iput(mip); //write MINODE back
+}
