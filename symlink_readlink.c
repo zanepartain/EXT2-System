@@ -73,6 +73,7 @@ int symlink(){
     }
 }
 
+
 /**
  * Read target file name of a symbolic
  */

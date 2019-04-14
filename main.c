@@ -34,6 +34,7 @@ char   line[256], cmd[32], pathname[256], sourcepath[256];
 #include "rmdir.c"
 #include "link_unlink.c"
 #include "symlink_readlink.c"
+#include "stat_chmod_utime.c"
 
 
 int init()
@@ -135,7 +136,7 @@ int main(int argc, char *argv[ ])
 
   //printf("hit a key to continue : "); getchar();
   while(1){
-    printf("input command : [ls|cd|pwd|quit] ");
+    printf("input command : [ls|cd|pwd|mkdir|rmdir|creat|link|unlink|symlink|readlink|quit] ");
     fgets(line, 128, stdin);
     line[strlen(line)-1] = 0;
     if (line[0]==0)
@@ -168,6 +169,8 @@ int main(int argc, char *argv[ ])
        symlink();
     if (strcmp(cmd,"readlink")==0)
        readlink(pathname,buf);
+    if (strcmp(cmd,"stat")==0)
+       my_stat(pathname);
 
     if (strcmp(cmd, "quit")==0)
        quit();
