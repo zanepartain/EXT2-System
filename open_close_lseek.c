@@ -131,6 +131,10 @@ int my_lseek(int fd, int position){
         if(position >= 0 && position < oftp->mptr->INODE.i_size){
             oftp->offset = position;
         }
+        else{
+            //error
+            printf("_err: new offset position is out of bounds\n");
+        }
     }
 
     return orig_offset;
