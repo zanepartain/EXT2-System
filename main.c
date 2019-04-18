@@ -44,7 +44,7 @@ int init()
   MINODE *mip;
   MTABLE *mtp;
   PROC   *p;
-
+  
   printf("init()\n");
 
   for (i=0; i<NMINODE; i++){
@@ -174,6 +174,9 @@ int main(int argc, char *argv[ ])
        my_stat(pathname);
     if (strcmp(cmd,"chmod")==0)
        my_chmod(pathname);
+   if (strcmp(cmd,"open")==0)
+       open_file(atoi(sourcepath));
+       
 
     if (strcmp(cmd, "quit")==0)
        quit();
