@@ -48,8 +48,14 @@ int link(){
                 printf("dirname = %s  ; sourcepath\n",new_dirname);
                 
                 //get the parent DIR MINODE
-                pino = getino(new_dirname);  
-                pmip = iget(dev, pino);     
+                if(strlen(new_dirname) == 0){
+                    pino = running->cwd->ino;
+                }
+                else{
+                    pino = getino(new_dirname);  
+                }
+                pmip = iget(dev, pino);  
+
                 //create new entry under parent, w/ old inode#
                 enter_name(pmip, old_ino, new_basename); 
 

@@ -58,7 +58,7 @@ int my_chmod(char *filepath){
     ino = getino(filepath);
     mip = iget(dev,ino);
 
-    mip->INODE.i_mode |=  0644;
+    mip->INODE.i_mode |=  0x1A4;
     mip->dirty = 1;
 
     iput(mip); //write MINODE back
