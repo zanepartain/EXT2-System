@@ -1,6 +1,6 @@
 /****************************************************************************
-*                   KCW testing ext2 file system                            *
-*                    Modified by: ZANE PARTAIN                              *
+*                   ZANE PARTAIN EXT2-File System                           *
+*                                                                           *
 *****************************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
@@ -35,6 +35,7 @@ char   line[256], cmd[32], pathname[256], sourcepath[256];
 #include "link_unlink.c"
 #include "symlink_readlink.c"
 #include "stat_chmod_utime.c"
+#include "open_close_lseek.c"
 
 
 int init()
