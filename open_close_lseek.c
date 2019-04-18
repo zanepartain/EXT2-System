@@ -17,6 +17,7 @@ extern char   line[256], cmd[32], pathname[256];
 
 #include "string.h"
 
+
 /**
  * Opens a file for read or write using O_RDONLY, O_WRONLY, O_RDWR.
  * These can be bitwise or-ed with O_CREAT, O_APPEND, O_TRUNC, etc.
@@ -78,4 +79,31 @@ int open_file(int mode){
     }
 
     return index; //return the index (-1) if error
+}
+
+
+/**
+ * Close an open File Descriptor. Ensure that it is infact open,
+ * then close it in the current running PROC.
+ */
+int close(int fd){
+
+    //check for valid fd
+    if(fd < 0 && fd >= NFD){
+        printf("_err: INVALID fd\n");
+        return;
+    }
+
+    if(running->fd[fd] != 0){
+        //points to an OFT; decrement refCount;
+        OFT oft = running->fd[fd];
+        oft.refCount--;
+
+        if(oft.refCount == 0){
+            iput(oft.mptr); 
+        }
+    }
+    
+    //clear OFT at index fd
+    running->fd[fd] = 0; 
 }
