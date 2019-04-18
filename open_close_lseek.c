@@ -86,24 +86,52 @@ int open_file(int mode){
  * Close an open File Descriptor. Ensure that it is infact open,
  * then close it in the current running PROC.
  */
-int close(int fd){
+int close_file(int fd){
 
     //check for valid fd
     if(fd < 0 && fd >= NFD){
         printf("_err: INVALID fd\n");
-        return;
+        return -1;
     }
 
     if(running->fd[fd] != 0){
         //points to an OFT; decrement refCount;
-        OFT oft = running->fd[fd];
-        oft.refCount--;
+        OFT *oftp = running->fd[fd];
+        oftp->refCount--;
 
-        if(oft.refCount == 0){
-            iput(oft.mptr); 
+        if(oftp->refCount == 0){
+            iput(oftp->mptr); 
         }
     }
-    
+
     //clear OFT at index fd
     running->fd[fd] = 0; 
+    return 0;
+}
+
+
+/**
+ * Set the offset of the open File Descriptor to the
+ * new offset position. Then return the old original offset.
+ */
+int my_lseek(int fd, int position){
+    int orig_offset;
+
+    //check for valid fd
+    if(fd < 0 && fd >= NFD){
+        printf("_err: INVALID fd\n");
+        return -1;
+    }
+
+    if(running->fd[fd] != 0){
+        OFT *oftp = running->fd[fd];
+        
+        //ensure the position is not out of bounds of file
+        if(position >= 0 && position < oftp->mptr->INODE.i_size){
+            orig_offset  = oftp->offset;
+            oftp->offset = position;
+        }
+    }
+
+    return orig_offset;
 }
