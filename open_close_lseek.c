@@ -115,7 +115,7 @@ int close_file(int fd){
  * new offset position. Then return the old original offset.
  */
 int my_lseek(int fd, int position){
-    int orig_offset;
+    int orig_offset = -1;
 
     //check for valid fd
     if(fd < 0 && fd >= NFD){
@@ -125,10 +125,10 @@ int my_lseek(int fd, int position){
 
     if(running->fd[fd] != 0){
         OFT *oftp = running->fd[fd];
+        orig_offset  = oftp->offset;
         
         //ensure the position is not out of bounds of file
         if(position >= 0 && position < oftp->mptr->INODE.i_size){
-            orig_offset  = oftp->offset;
             oftp->offset = position;
         }
     }
