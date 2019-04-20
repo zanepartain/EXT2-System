@@ -554,6 +554,27 @@ int child_count(MINODE *pmip){
     return count;
 }
 
+/*Print contents of an MINODE*/
+int printMINODE(MINODE *mip){
+    printf("--------- MINODE --------\n");
+    printf("[dev: %d, ino: %d]   ", mip->dev, mip->ino);
+    printf("refCount: %d    ", mip->refCount);
+    printf("dirty: %d    ", mip->dirty);
+    printf("-------------------------\n");
+}
+
+/*Print contents of an OFT*/
+int printOFT(OFT oftp){
+
+    printf("--------- OFT --------\n");
+    printf("mptr: %d rc:%d    ", oftp.mptr->ino, oftp.mptr->refCount);
+    printf("mode: %d    ", oftp.mode);
+    printf("offset: %d  ", oftp.offset);
+    printf("refCount: %d \n", oftp.refCount);
+    printf("----------------------\n");
+
+}
+
 /*************************END MY UTILITY FUNCTIONS**********************************/
 /***********************************************************************************/
 

@@ -67,6 +67,7 @@ int open_file(int mode){
         if(index != -1){
             //insert new oft entry to running PROC
             running->fd[index] = &oft;
+            printOFT(oft);
         }
         else{
             //error
@@ -102,6 +103,8 @@ int close_file(int fd){
         if(oftp->refCount == 0){
             iput(oftp->mptr); 
         }
+
+        printOFT((*oftp));
     }
 
     //clear OFT at index fd

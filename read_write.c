@@ -1,5 +1,5 @@
 /************* read_write.c file **************/
-#include "type.h";
+#include "type.h"
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
 extern MINODE *root;
@@ -27,6 +27,8 @@ int read_file(int fd,char *buf, int nbytes){
     OFT *ofd = running->fd[fd];    //get open file descriptor
     MINODE *mip = ofd->mptr;       //get MINODE of open file descriptor
     
+    if(ofd->)
+
     //offset of READ file ; logical block; 
     // available bytes in file ; start READ ; remaining bytes;               
     int offset = ofd->offset;
@@ -34,8 +36,4 @@ int read_file(int fd,char *buf, int nbytes){
     int start  = offset % BLKSIZE;
     int remaining = BLKSIZE - start;
     int available = mip->INODE.i_size - offset;
-
-
-
-
 }
