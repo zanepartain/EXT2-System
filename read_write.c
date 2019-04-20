@@ -23,13 +23,19 @@ extern char   line[256], cmd[32], pathname[256];
  * area in user space.
  */
 int read_file(int fd,char *buf, int nbytes){
+    int byte_count = 0;            //bytes read
     OFT *ofd = running->fd[fd];    //get open file descriptor
     MINODE *mip = ofd->mptr;       //get MINODE of open file descriptor
     
-    //num of bytes read ; offset of READ file ; available bytes in file  
-    int byte_count = 0;               
+    //offset of READ file ; logical block; 
+    // available bytes in file ; start READ ; remaining bytes;               
     int offset = ofd->offset;
+    int lbk    = offset / BLKSIZE;
+    int start  = offset % BLKSIZE;
+    int remaining = BLKSIZE - start;
     int available = mip->INODE.i_size - offset;
 
-    
+
+
+
 }
