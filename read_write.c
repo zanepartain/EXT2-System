@@ -24,9 +24,9 @@ extern char   line[256], cmd[32], pathname[256];
  * area in user space.
  */
 int read_file(int fd,char *buf, int nbytes){
-    char sbuf[BLKSIZE], kbuf[BLKSIZE];
+    char sbuf[BLKSIZE], readbuf[BLKSIZE];
     int byte_count = 0, blk = -1;      //bytes read & blk number
-    char *cp = buf;                    //cp points to buf
+    char *cbuf = buf;                    //cbuf points to buf
     OFT *ofd = running->fd[fd];        //get open file descriptor
     MINODE *mip = ofd->mptr;           //get MINODE of open file descriptor
     
@@ -35,15 +35,14 @@ int read_file(int fd,char *buf, int nbytes){
         return;
     }
 
-    //offset of READ file ; logical block; 
-    // available bytes in file ; start READ ; remaining bytes;               
+    //offset of READ file 
+    // available bytes in file
     int offset = ofd->offset;
-    int lbk    = offset / BLKSIZE;
-    int start  = offset % BLKSIZE;
-    int remaining = BLKSIZE - start;
     int available = mip->INODE.i_size - offset;
 
     while(nbytes && available){
+        int lbk    = offset / BLKSIZE;
+        int start  = offset % BLKSIZE;
 
         if(lbk < 12){
             //DIRECT BLOCK
@@ -89,5 +88,27 @@ int read_file(int fd,char *buf, int nbytes){
                 didp++; //advance DIB
             }
         }
-    }
+
+        /*Get data blk into readbuf*/
+        get_block(mip->dev, blk, readbuf);  
+
+        char *cp = readbuf + start;
+        int remaining = BLKSIZE - start;
+
+        while(remaining > 0){
+            *cbuf = *cp++;     //copy byte from readbuf[] into buf[]
+            ofd->offset++;     //advance offset
+            byte_count++;      //inc byte count
+            available--;       //dec the following
+            nbytes--;
+            remaining--;
+            if(nbytes <= 0 || available <= 0)
+            {
+                break;
+            }
+        }
+
+    }//end of while(nbytes && available)
+    printf("myread: read %d char from file descriptor %d\n", byte_count, fd);
+    return byte_count;
 }

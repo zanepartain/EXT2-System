@@ -14,6 +14,9 @@ GD     *gp;
 INODE  *ip;
 DIR    *dp;   
 
+char  buffer[256];
+char  mode[2];
+
 //Default dir and regular file modes
 #define DIR_MODE      0x41ED
 #define FILE_MODE     0x81AE

@@ -139,12 +139,13 @@ int main(int argc, char *argv[ ])
   //printf("hit a key to continue : "); getchar();
   while(1){
     printf("input command : [ls|cd|pwd|mkdir|rmdir|creat|link|unlink|symlink|readlink|quit] ");
-    fgets(line, 128, stdin);
-    line[strlen(line)-1] = 0;
+    fgets(line,128,stdin);
+    line[strlen(line)-1] = 0; 
     if (line[0]==0)
       continue;
     pathname[0] = 0;
     cmd[0] = 0;
+    sourcepath[0] = 0;
     
     sscanf(line, "%s %s %s", cmd, pathname,sourcepath);
     printf("cmd=%s pathname=%s\n", cmd, pathname);
@@ -177,7 +178,7 @@ int main(int argc, char *argv[ ])
        my_chmod(pathname);
    if (strcmp(cmd,"open")==0)
    {
-       fd = open_file();
+       fd = open_file(pathname,sourcepath);
    }
    if (strcmp(cmd,"close")==0)
        close_file(fd);

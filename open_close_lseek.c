@@ -78,23 +78,26 @@ int truncate(MINODE *mip){
  * These can be bitwise or-ed with O_CREAT, O_APPEND, O_TRUNC, etc.
  * Return a file descriptor.
  */
-int open_file(){
+int open_file(char *file, char *mode_string){
     //mode := 0|1|2|3 for R|W|RW|APPEND
     char  buf[256];
-    char mode[2];
-    int ino, index = -1;
-    MINODE *mip;
-    struct stat mstat;
+    int mode;
+    int ino, index;
+    MINODE *mip; 
 
-    printf("Enter pathname and mode: ");
-    fgets(buf, 128, stdin);
-    buf[strlen(buf)-1] = 0;
-    if (buf[0]==0)
-    {
-        return; //error
+    /*Convert mode str input to mode int*/
+    if(strcmp(mode_string,"R") == 0){
+        mode = 0;
     }
-    sscanf(buf,"%s %s", pathname, mode);
-    
+    else if(strcmp(mode_string,"W") == 0){
+        mode = 1;
+    }
+    else if(strcmp(mode_string,"RW") == 0){
+        mode = 2;
+    }
+    else if(strcmp(mode_string,"APPEND") == 0){
+        mode = 3;
+    }
 
     ino = getino(pathname); //get file inode#
 
@@ -109,48 +112,40 @@ int open_file(){
     if(dir_or_file(mip) == 0){
         //is a REG FILE
         //create new open file table instance
-        OFT oft;
-        oft.mode = atoi(mode);
-        oft.mptr = mip;
-        oft.refCount = 1;
+        //search for first free fd[index] entry
+        OFT *oft = (OFT *)malloc(sizeof(OFT)); 
+
+        oft->mode = mode;
+        oft->mptr = mip;
+        oft->refCount = 1;
 
         //set oft offset
         if(mode == 3){
-            oft.offset = mip->INODE.i_size; //mode:=APPEND
+            oft->offset = mip->INODE.i_size; //mode:=APPEND
         }
         else if(mode == 1){
             //mode:=WRITE (W)
             truncate(mip);  
-            oft.offset = 0;
+            oft->offset = 0;
         }
         else{
-            oft.offset = 0;
+            oft->offset = 0;
         }
-        
-        //search for first free fd[index] entry 
-        for(int i = 0; i < NFD; i++){
-            //free entry 
-            if(running->fd[i] == 0){
-                index = i;
+
+        for(index = 0; index < NFD; index++){
+            if(running->fd[index] == 0){
+                running->fd[index] = oft;
                 break;
             }
         }
 
-        if(index != -1){
-            //insert new oft entry to running PROC
-            running->fd[index] = &oft;
-            printOFT(oft);
-        }
-        else{
-            //error
-            printf("_err: No FREE fd entries available\n");
-        }
     }
     else{
         //error
         printf("_err: %s is not a REG FILE\n",name[n-1]);
     }
 
+    mip->dirty = 1;
     return index; //return the index (-1) if error
 }
 
