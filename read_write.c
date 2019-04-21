@@ -16,6 +16,7 @@ extern char   line[256], cmd[32], pathname[256];
 #define OTHER  000007
 
 #include "string.h"
+#include <stdbool.h>
 
 
 /**
@@ -23,9 +24,11 @@ extern char   line[256], cmd[32], pathname[256];
  * area in user space.
  */
 int read_file(int fd,char *buf, int nbytes){
-    int byte_count = 0;            //bytes read
-    OFT *ofd = running->fd[fd];    //get open file descriptor
-    MINODE *mip = ofd->mptr;       //get MINODE of open file descriptor
+    char sbuf[BLKSIZE], kbuf[BLKSIZE];
+    int byte_count = 0, blk = -1;      //bytes read & blk number
+    char *cp = buf;                    //cp points to buf
+    OFT *ofd = running->fd[fd];        //get open file descriptor
+    MINODE *mip = ofd->mptr;           //get MINODE of open file descriptor
     
     if(ofd->mode != 0 && ofd->mode != 2){
         printf("_err: FILE not open for RD or RW\n");
@@ -39,4 +42,52 @@ int read_file(int fd,char *buf, int nbytes){
     int start  = offset % BLKSIZE;
     int remaining = BLKSIZE - start;
     int available = mip->INODE.i_size - offset;
+
+    while(nbytes && available){
+
+        if(lbk < 12){
+            //DIRECT BLOCK
+            //turn to physical block
+            blk = mip->INODE.i_block[lbk];
+        }
+        else if (lbk >= 12 && lbk < 256+12){
+            //INDIRECT BLOCK
+            get_block(dev,mip->INODE.i_block[12],sbuf);
+            int *idp = (int *)sbuf;
+            
+            while(*idp && idp < sbuf + BLKSIZE){
+                //turn to physical block;
+                if(*idp == lbk){
+                    blk = lbk; 
+                    break;
+                }
+                idp++;
+            }
+
+        }
+        else{
+            //DOUBLE INDIRECT BLOCK
+            get_block(dev, mip->INODE.i_block[13], sbuf);
+            int *didp = (int *)sbuf;
+            bool found = false;
+
+            while(*didp && didp < sbuf+BLKSIZE && !found){
+                char tbuf[BLKSIZE];
+                get_block(dev,*didp,tbuf);
+                int *idp = (int *)tbuf;
+
+                ///check for lkb in indirect blks
+                while(*idp && idp < tbuf+BLKSIZE && !found){
+                    if(*idp == lbk){
+                        //turn to physical block
+                        blk = lbk; 
+                        found = true;
+                    }
+                    idp++;
+                } 
+
+                didp++; //advance DIB
+            }
+        }
+    }
 }

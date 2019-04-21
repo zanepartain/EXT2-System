@@ -177,8 +177,7 @@ int main(int argc, char *argv[ ])
        my_chmod(pathname);
    if (strcmp(cmd,"open")==0)
    {
-       strcpy(buf,sourcepath);
-       fd = open_file(atoi(buf));
+       fd = open_file();
    }
    if (strcmp(cmd,"close")==0)
        close_file(fd);

@@ -1,5 +1,5 @@
 /************* open_close_lseek.c file **************/
-#include "type.h"
+
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
 extern MINODE *root;
@@ -71,6 +71,7 @@ int truncate(MINODE *mip){
 
   return 0;
 }
+
 
 /**
  * Opens a file for read or write using O_RDONLY, O_WRONLY, O_RDWR.
@@ -197,6 +198,7 @@ int my_lseek(int fd, int position){
         return -1;
     }
 
+    //ensure OFT exists
     if(running->fd[fd] != 0){
         OFT *oftp = running->fd[fd];
         orig_offset  = oftp->offset;
