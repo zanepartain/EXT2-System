@@ -1,5 +1,5 @@
 /************* read_write.c file **************/
-#include "type.h"
+
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
 extern MINODE *root;
@@ -27,7 +27,10 @@ int read_file(int fd,char *buf, int nbytes){
     OFT *ofd = running->fd[fd];    //get open file descriptor
     MINODE *mip = ofd->mptr;       //get MINODE of open file descriptor
     
-    if(ofd->)
+    if(ofd->mode != 0 && ofd->mode != 2){
+        printf("_err: FILE not open for RD or RW\n");
+        return;
+    }
 
     //offset of READ file ; logical block; 
     // available bytes in file ; start READ ; remaining bytes;               

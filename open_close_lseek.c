@@ -1,5 +1,5 @@
 /************* open_close_lseek.c file **************/
-
+#include "type.h"
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
 extern MINODE *root;
@@ -19,15 +19,67 @@ extern char   line[256], cmd[32], pathname[256];
 
 
 /**
+ * Truncate the all of the MINODE's Data blocks, by deallocating them.
+ * Then set the MINODE size to 0
+ */
+int truncate(MINODE *mip){
+  int i, inode_num, blk, offset;
+  char sbuf[BLKSIZE];
+  char *char_p;
+  
+    for(int i = 0; i < 12; i++){
+        if(mip->INODE.i_block[i] == 0){
+            continue;
+        }
+        //deallocate the BLOCK
+        bdalloc(mip->dev, mip->INODE.i_block[i]);
+    }
+
+    //deallocate indirect blocks
+    get_block(dev, mip->INODE.i_block[12],sbuf);
+    int *idp = (int *)sbuf;
+
+     while(*idp && idp < sbuf + BLKSIZE){
+         bdalloc(dev,idp);
+         idp++;
+     }
+
+    //deallocate double indirect blocks
+    get_block(dev, mip->INODE.i_block[13],sbuf);
+    int *didp = (int *)sbuf;
+
+     while(*didp && didp < sbuf + BLKSIZE){
+         bdalloc(dev,didp);
+         didp++;
+     }
+
+     mip->INODE.i_size = 0; 
+
+  return 0;
+}
+
+/**
  * Opens a file for read or write using O_RDONLY, O_WRONLY, O_RDWR.
  * These can be bitwise or-ed with O_CREAT, O_APPEND, O_TRUNC, etc.
  * Return a file descriptor.
  */
-int open_file(int mode){
+int open_file(){
     //mode := 0|1|2|3 for R|W|RW|APPEND
+    char  buf[256];
+    char mode[2];
     int ino, index = -1;
     MINODE *mip;
     struct stat mstat;
+
+    printf("Enter pathname and mode: ");
+    fgets(buf, 128, stdin);
+    buf[strlen(buf)-1] = 0;
+    if (buf[0]==0)
+    {
+        return; //error
+    }
+    sscanf(buf,"%s %s", pathname, mode);
+    
 
     ino = getino(pathname); //get file inode#
 
@@ -43,7 +95,7 @@ int open_file(int mode){
         //is a REG FILE
         //create new open file table instance
         OFT oft;
-        oft.mode = mode;
+        oft.mode = atoi(mode);
         oft.mptr = mip;
         oft.refCount = 1;
 
@@ -99,12 +151,12 @@ int close_file(int fd){
         //points to an OFT; decrement refCount;
         OFT *oftp = running->fd[fd];
         oftp->refCount--;
-
+        printOFT((*oftp));
         if(oftp->refCount == 0){
             iput(oftp->mptr); 
         }
 
-        printOFT((*oftp));
+        
     }
 
     //clear OFT at index fd

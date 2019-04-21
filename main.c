@@ -36,6 +36,7 @@ char   line[256], cmd[32], pathname[256], sourcepath[256];
 #include "symlink_readlink.c"
 #include "stat_chmod_utime.c"
 #include "open_close_lseek.c"
+#include "read_write.c"
 
 
 int init()
@@ -175,9 +176,14 @@ int main(int argc, char *argv[ ])
     if (strcmp(cmd,"chmod")==0)
        my_chmod(pathname);
    if (strcmp(cmd,"open")==0)
-       fd = open_file(atoi(sourcepath));
+   {
+       strcpy(buf,sourcepath);
+       fd = open_file(atoi(buf));
+   }
    if (strcmp(cmd,"close")==0)
-       close_file(fd); 
+       close_file(fd);
+   if (strcmp(cmd,"read")==0)
+       read_file(fd,buf,1024); 
 
     if (strcmp(cmd, "quit")==0)
        quit();
