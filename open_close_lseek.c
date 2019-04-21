@@ -24,7 +24,7 @@ extern char   line[256], cmd[32], pathname[256];
  */
 int truncate(MINODE *mip){
   int i, inode_num, blk, offset;
-  char sbuf[BLKSIZE];
+  char sbuf[BLKSIZE], tbuf[BLKSIZE];
   char *char_p;
   
     for(int i = 0; i < 12; i++){
@@ -40,7 +40,7 @@ int truncate(MINODE *mip){
     int *idp = (int *)sbuf;
 
      while(*idp && idp < sbuf + BLKSIZE){
-         bdalloc(dev,idp);
+         bdalloc(dev,*idp);
          idp++;
      }
 
@@ -49,11 +49,25 @@ int truncate(MINODE *mip){
     int *didp = (int *)sbuf;
 
      while(*didp && didp < sbuf + BLKSIZE){
-         bdalloc(dev,didp);
-         didp++;
+         //get indirect blocks
+         memset(tbuf, 0, BLKSIZE);
+         get_block(dev,*didp,tbuf);
+         idp = (int *)tbuf;
+
+         while(*idp && idp < tbuf + BLKSIZE){
+            //deallocate indirect blocks
+            bdalloc(dev,*idp);
+            idp++;
+         }
+
+         bdalloc(dev, *didp); //deallocate double indirect block
+         didp++;             //advance to next DIB
      }
 
+    //touch the FILE
+     mip->INODE.i_atime = mip->INODE.i_mtime = mip->INODE.i_ctime = time(0L);
      mip->INODE.i_size = 0; 
+     mip->dirty = 1;
 
   return 0;
 }
@@ -99,9 +113,14 @@ int open_file(){
         oft.mptr = mip;
         oft.refCount = 1;
 
-        //if mode:=APPEND
+        //set oft offset
         if(mode == 3){
-            oft.offset = mip->INODE.i_size;
+            oft.offset = mip->INODE.i_size; //mode:=APPEND
+        }
+        else if(mode == 1){
+            //mode:=WRITE (W)
+            truncate(mip);  
+            oft.offset = 0;
         }
         else{
             oft.offset = 0;
