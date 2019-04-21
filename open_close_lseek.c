@@ -17,6 +17,33 @@ extern char   line[256], cmd[32], pathname[256];
 
 #include "string.h"
 
+/**
+ * Convert the mode_string into an integer rep. that will be returned.
+ */
+int get_mode(char *mode_string){
+    int mode;
+
+    /*Convert mode str input to mode int*/
+    if(strcmp(mode_string,"R") == 0){
+        mode = 0;
+    }
+    else if(strcmp(mode_string,"W") == 0){
+        mode = 1;
+    }
+    else if(strcmp(mode_string,"RW") == 0){
+        mode = 2;
+    }
+    else if(strcmp(mode_string,"APPEND") == 0){
+        mode = 3;
+    }
+    else{
+        //NONE MODE
+        mode = -1;
+    }
+
+    return mode;
+}
+
 
 /**
  * Truncate the all of the MINODE's Data blocks, by deallocating them.
@@ -82,22 +109,10 @@ int open_file(char *file, char *mode_string){
     //mode := 0|1|2|3 for R|W|RW|APPEND
     char  buf[256];
     int mode;
-    int ino, index;
+    int ino, index = -1;
     MINODE *mip; 
 
-    /*Convert mode str input to mode int*/
-    if(strcmp(mode_string,"R") == 0){
-        mode = 0;
-    }
-    else if(strcmp(mode_string,"W") == 0){
-        mode = 1;
-    }
-    else if(strcmp(mode_string,"RW") == 0){
-        mode = 2;
-    }
-    else if(strcmp(mode_string,"APPEND") == 0){
-        mode = 3;
-    }
+    mode = get_mode(mode_string); //get mode
 
     ino = getino(pathname); //get file inode#
 
@@ -112,7 +127,6 @@ int open_file(char *file, char *mode_string){
     if(dir_or_file(mip) == 0){
         //is a REG FILE
         //create new open file table instance
-        //search for first free fd[index] entry
         OFT *oft = (OFT *)malloc(sizeof(OFT)); 
 
         oft->mode = mode;
@@ -121,7 +135,8 @@ int open_file(char *file, char *mode_string){
 
         //set oft offset
         if(mode == 3){
-            oft->offset = mip->INODE.i_size; //mode:=APPEND
+            //mode:=APPEND
+            oft->offset = mip->INODE.i_size; 
         }
         else if(mode == 1){
             //mode:=WRITE (W)
@@ -132,11 +147,21 @@ int open_file(char *file, char *mode_string){
             oft->offset = 0;
         }
 
-        for(index = 0; index < NFD; index++){
-            if(running->fd[index] == 0){
-                running->fd[index] = oft;
+        //search for first free fd[index] entry
+        for(int i = 0; i < NFD; i++){
+            if(running->fd[i] == 0){
+                index = i;
                 break;
             }
+        }
+
+        //assign new OFT to running PROC fd[]
+        if(index != -1){
+            running->fd[index] = oft;
+        }
+        else{
+            //error
+            printf("_err: No free file descriptors\n");
         }
 
     }
@@ -145,7 +170,7 @@ int open_file(char *file, char *mode_string){
         printf("_err: %s is not a REG FILE\n",name[n-1]);
     }
 
-    mip->dirty = 1;
+
     return index; //return the index (-1) if error
 }
 

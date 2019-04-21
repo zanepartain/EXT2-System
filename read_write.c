@@ -52,17 +52,7 @@ int read_file(int fd,char *buf, int nbytes){
         else if (lbk >= 12 && lbk < 256+12){
             //INDIRECT BLOCK
             get_block(dev,mip->INODE.i_block[12],sbuf);
-            int *idp = (int *)sbuf;
-            
-            while(*idp && idp < sbuf + BLKSIZE){
-                //turn to physical block;
-                if(*idp == lbk){
-                    blk = lbk; 
-                    break;
-                }
-                idp++;
-            }
-
+            blk = sbuf[lbk-12];
         }
         else{
             //DOUBLE INDIRECT BLOCK
