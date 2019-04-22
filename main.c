@@ -36,7 +36,7 @@ char   line[256], cmd[32], pathname[256], sourcepath[256];
 #include "symlink_readlink.c"
 #include "stat_chmod_utime.c"
 #include "open_close_lseek.c"
-#include "read_write.c"
+#include "read_cat.c"
 
 
 int init()

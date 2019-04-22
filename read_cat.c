@@ -1,4 +1,4 @@
-/************* read_write.c file **************/
+/************* read_cat.c file **************/
 
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
