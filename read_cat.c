@@ -26,7 +26,7 @@ extern char   line[256], cmd[32], pathname[256];
 int read_file(int fd,char *buf, int nbytes){
     char sbuf[BLKSIZE], readbuf[BLKSIZE];
     int byte_count = 0, blk = -1;      //bytes read & blk number
-    char *cbuf = buf;                    //cbuf points to buf
+    char *cbuf = buf;                  //cbuf points to buf
     OFT *ofd = running->fd[fd];        //get open file descriptor
     MINODE *mip = ofd->mptr;           //get MINODE of open file descriptor
     
@@ -101,4 +101,20 @@ int read_file(int fd,char *buf, int nbytes){
     }//end of while(nbytes && available)
     printf("myread: read %d char from file descriptor %d\n", byte_count, fd);
     return byte_count;
+}
+
+
+int cat_file(char *file){
+    char mybuf[BLKSIZE], dummy = 0; //mybuf[] and null char
+    int n;
+
+    int lfd = open_file(file,"R"); //open file for READ
+
+    while(n = read_file(lfd,mybuf,BLKSIZE)){
+        //print null terminated string
+        mybuf[n] = 0;
+        printf("%s",mybuf);
+    }
+
+    close_file(lfd);
 }
