@@ -75,7 +75,8 @@ int mywrite(int fd, char *buf, int nbytes){
         int lbk   = oftp->offset / BLKSIZE;
         int start = oftp->offset % BLKSIZE;
 
-        if(lbk < 12){  //DIRECT BLOCK
+        if(lbk < 12){  
+            //DIRECT BLOCK
  
             if(mip->INODE.i_block[lbk] == 0){
                 //allocate DB if no DB
@@ -85,7 +86,8 @@ int mywrite(int fd, char *buf, int nbytes){
             //turn lbk to blk   
             blk = mip->INODE.i_block[lbk]; 
         }
-        else if(lbk >= 12 && lbk < 256+12){ //INDIRECT BLOCK 
+        else if(lbk >= 12 && lbk < 256+12){ 
+            //INDIRECT BLOCK 
 
             if(mip->INODE.i_block[12] == 0){
                 //allocate new block
@@ -108,6 +110,12 @@ int mywrite(int fd, char *buf, int nbytes){
             if(blk == 0){
                 blk = balloc(mip->dev);
             }
+        }
+        else{
+            //DOUBLE INDIRECT BLOCK
+
+            
+
         }
     }
 }
