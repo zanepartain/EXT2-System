@@ -37,6 +37,7 @@ char   line[256], cmd[32], pathname[256], sourcepath[256];
 #include "stat_chmod_utime.c"
 #include "open_close_lseek.c"
 #include "read_cat.c"
+#include "write_cp.c"
 
 
 int init()
@@ -182,6 +183,8 @@ int main(int argc, char *argv[ ])
        close_file(fd);
    if (strcmp(cmd,"read")==0)
        read_file(fd,buf,1024); 
+   if(strcmp(cmd,"write") == 0)
+       write_file();
 
     if (strcmp(cmd, "quit")==0)
        quit();
