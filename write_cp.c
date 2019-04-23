@@ -65,7 +65,7 @@ int write_file(){
  */
 int mywrite(int fd, char *buf, int nbytes){
     char sbuf[BLKSIZE];
-    int blk, byte_count = 0;       //num bytes written to fd
+    int *iptr, blk, byte_count = 0;       //num bytes written to fd
     OFT *oftp = running->fd[fd];   //get OFT
     MINODE *mip = oftp->mptr;      //point to MINODE of OFT
 
@@ -104,7 +104,8 @@ int mywrite(int fd, char *buf, int nbytes){
             }
 
             get_block(dev, mip->INODE.i_block[12],sbuf);
-            blk = sbuf[lbk - 12];
+            iptr = (int *)sbuf +lbk - 12;
+            blk = *iptr;
 
             //if DB doesnt exist yet, allocate it
             if(blk == 0){
@@ -130,10 +131,12 @@ int mywrite(int fd, char *buf, int nbytes){
 
             get_block(mip->dev,mip->INODE.i_block[13],sbuf);
 
-            int id_blk = (lbk - 268) / 256;      //get indirect blk num
-            int ind_offset = (lbk - 268) % 256;  //get indirect blk offset
+            int ind_blk = (lbk - 268) / 256;      //get indirect blk num
+            int ind_offset = (lbk - 268) % 256;   //get indirect blk offset
 
-            blk = sbuf[id_blk];                  //get id_blk into blk
+            //get ind_blk into blk
+            iptr = (int *)sbuf + ind_blk; 
+            blk = *iptr;                  
 
             if(blk == 0){
                 //no blk yet; so allocate blk
@@ -148,9 +151,11 @@ int mywrite(int fd, char *buf, int nbytes){
                 //write ind_blk back to disk
                 put_block(mip->dev, blk, sbuf);
             }
-
+            
+            //get ind_blk offset block
             get_block(mip->dev, blk, sbuf);
-            blk = sbuf + ind_offset;
+            iptr = (int *)sbuf + ind_offset;
+            blk = *iptr;
 
             if(blk == 0){
                 //allocate new blk; write back to disk
@@ -160,6 +165,6 @@ int mywrite(int fd, char *buf, int nbytes){
         }
 
         get_block(mip->dev, blk, sbuf);
-        
+
     }
 }
