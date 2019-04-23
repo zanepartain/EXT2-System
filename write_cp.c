@@ -17,6 +17,7 @@ extern char   line[256], cmd[32], pathname[256];
 
 #include <string.h>
 
+
 /**
  * Prompt user for an fd to write to. Verify it is infact an open fd with RW || WR
  * mode. Then prompt the user for an input text. Pass the fd, text, and nbytes to mywrite
@@ -59,3 +60,15 @@ int write_file(){
 }
 
 
+/**
+ * 
+ */
+int mywrite(int fd, char *buf, int nbytes){
+    int byte_count = 0; //num bytes written to fd
+
+    /*Write the buf to the fd as long as the fd has space, and
+    there are bytes left to write.*/
+    while(nbytes){
+        
+    }
+}
