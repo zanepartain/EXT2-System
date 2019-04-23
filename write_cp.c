@@ -1,5 +1,5 @@
 /************* write_cp.c file **************/
-
+#include "type.h"
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
 extern MINODE *root;
@@ -64,11 +64,50 @@ int write_file(){
  * 
  */
 int mywrite(int fd, char *buf, int nbytes){
-    int byte_count = 0; //num bytes written to fd
+    char sbuf[BLKSIZE];
+    int blk, byte_count = 0;       //num bytes written to fd
+    OFT *oftp = running->fd[fd];   //get OFT
+    MINODE *mip = oftp->mptr;      //point to MINODE of OFT
 
     /*Write the buf to the fd as long as the fd has space, and
     there are bytes left to write.*/
-    while(nbytes){
-        
+    while(nbytes > 0){
+        int lbk   = oftp->offset / BLKSIZE;
+        int start = oftp->offset % BLKSIZE;
+
+        if(lbk < 12){  //DIRECT BLOCK
+ 
+            if(mip->INODE.i_block[lbk] == 0){
+                //allocate DB if no DB
+                mip->INODE.i_block[lbk] = balloc(mip->dev); 
+            }
+
+            //turn lbk to blk   
+            blk = mip->INODE.i_block[lbk]; 
+        }
+        else if(lbk >= 12 && lbk < 256+12){ //INDIRECT BLOCK 
+
+            if(mip->INODE.i_block[12] == 0){
+                //allocate new block
+                mip->INODE.i_block[12] = balloc(mip->dev);
+                
+                //zero out entire indirect blocks
+                get_block(dev, mip->INODE.i_block[12],sbuf);
+                for(int i = 0; i < BLKSIZE; i++){
+                    sbuf[i] = 0;
+                }
+
+                //write i_block[12] back to disk
+                put_block(mip->dev,mip->INODE.i_block[12], sbuf);
+            }
+
+            get_block(dev, mip->INODE.i_block[12],sbuf);
+            blk = sbuf[lbk - 12];
+
+            //if DB doesnt exist yet, allocate it
+            if(blk == 0){
+                blk = balloc(mip->dev);
+            }
+        }
     }
 }
