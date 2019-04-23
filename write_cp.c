@@ -114,8 +114,52 @@ int mywrite(int fd, char *buf, int nbytes){
         else{
             //DOUBLE INDIRECT BLOCK
 
-            
+            if(mip->INODE.i_block[13] == 0){
+                //allocate new data block
+                mip->INODE.i_block[13] = balloc(mip->dev);
 
+                //zero out entire 13th block
+                get_block(mip->dev,mip->INODE.i_block[13],sbuf);
+                for(int i = 0; i < BLKSIZE; i++){
+                    sbuf[i] = 0;
+                }
+
+                //write i_lock[13] back to disk
+                put_block(mip->dev,mip->INODE.i_block[13],sbuf);
+            }
+
+            get_block(mip->dev,mip->INODE.i_block[13],sbuf);
+
+            int id_blk = (lbk - 268) / 256;      //get indirect blk num
+            int ind_offset = (lbk - 268) % 256;  //get indirect blk offset
+
+            blk = sbuf[id_blk];                  //get id_blk into blk
+
+            if(blk == 0){
+                //no blk yet; so allocate blk
+                blk = balloc(mip->dev);
+
+                //zero entire ind_blk
+                get_block(mip->dev, blk, sbuf);
+                for(int i = 0; i < BLKSIZE; i++){
+                    sbuf[i] = 0;
+                }
+
+                //write ind_blk back to disk
+                put_block(mip->dev, blk, sbuf);
+            }
+
+            get_block(mip->dev, blk, sbuf);
+            blk = sbuf + ind_offset;
+
+            if(blk == 0){
+                //allocate new blk; write back to disk
+                blk = balloc(mip->dev);
+                put_block(mip->dev, blk, sbuf);
+            }
         }
+
+        get_block(mip->dev, blk, sbuf);
+        
     }
 }
