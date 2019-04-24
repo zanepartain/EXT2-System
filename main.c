@@ -168,7 +168,7 @@ int main(int argc, char *argv[ ])
     if (strcmp(cmd,"rmdir")==0)
        remove_directory();
     if (strcmp(cmd,"link")==0)
-       link();
+       mylink();
     if (strcmp(cmd,"unlink")==0)
        unlink();
     if (strcmp(cmd,"symlink")==0)
@@ -191,6 +191,8 @@ int main(int argc, char *argv[ ])
        write_file();
    if(strcmp(cmd,"cp") == 0)
        mycp(pathname,sourcepath);
+   if(strcmp(cmd,"mv") == 0)
+       mymv(pathname,sourcepath);
 
     if (strcmp(cmd, "quit")==0)
        quit();

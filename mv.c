@@ -21,6 +21,26 @@ extern char   line[256], cmd[32], pathname[256];
 /**
  * Move a source file to a destination.
  */
-int mymv(){
+int mymv(char *source, char *dest){
+    char sbuf[BLKSIZE];   //source file buffer[]
+    int sino, dino;       //soucre & dest ino
+    int lsfd, ldfd;       //source & dest fd
+    int nbytes;           //number of bytes read from source
+    MINODE *smip, *dmip;  //source & dest MINODE's
 
+    /*Get source ino and verify it exists*/
+    sino = getino(source);
+
+    if(sino == 0){
+        printf("_err: (source) %s DNE\n", name[n-1]);
+        return;
+    }
+
+    smip = iget(dev,sino); //source MINODE
+
+    mylink(); //link source and dest
+
+    unlink(); //unlink source from parent
+
+    return;
 }
