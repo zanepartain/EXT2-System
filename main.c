@@ -188,6 +188,8 @@ int main(int argc, char *argv[ ])
        cat_file(pathname); 
    if(strcmp(cmd,"write") == 0)
        write_file();
+   if(strcmp(cmd,"cp") == 0)
+       mycp(pathname,sourcepath);
 
     if (strcmp(cmd, "quit")==0)
        quit();
