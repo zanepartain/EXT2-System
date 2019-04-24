@@ -39,6 +39,7 @@ char   line[256], cmd[32], pathname[256], sourcepath[256];
 #include "read_cat.c"
 #include "write.c"
 #include "cp.c"
+#include "mv.c"
 
 
 int init()
