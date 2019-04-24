@@ -40,7 +40,7 @@ int mylink(){
         {
             int new_ino = getino(sourcepath); //get new_ino & tokenize sourepath
 
-            if(new_ino != 0){
+            if(new_ino == 0){
                 printf("GOOD TO GO ~~ LINK BOTH FILES\n");
                 dirname_basename(new_dirname,new_basename);  //get dirname & basename of sourcepath
 

@@ -38,6 +38,9 @@ int mymv(char *source, char *dest){
 
     smip = iget(dev,sino); //source MINODE
 
+    strcat(dest,"/");
+    strcat(dest,name[n-1]);
+
     mylink(); //link source and dest
 
     unlink(); //unlink source from parent
