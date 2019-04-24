@@ -61,13 +61,15 @@ int write_file(){
 
 
 /**
- * 
+ * Write text to an open fd. If the data block you are writing DNE,
+ * then allocate the block, zero it out, and write it back before continuing 
+ * to write the text buffer to the open fd.
  */
 int mywrite(int fd, char *buf, int nbytes){
-    char sbuf[BLKSIZE];
-    int *iptr, blk, byte_count = 0;       //num bytes written to fd
-    OFT *oftp = running->fd[fd];   //get OFT
-    MINODE *mip = oftp->mptr;      //point to MINODE of OFT
+    char wbuf[BLKSIZE], *cq = buf;     //cq points at buf[]
+    int *iptr, blk, byte_count = 0;    //num bytes written to fd
+    OFT *oftp = running->fd[fd];       //get OFT
+    MINODE *mip = oftp->mptr;          //point to MINODE of OFT
 
     /*Write the buf to the fd as long as the fd has space, and
     there are bytes left to write.*/
@@ -75,39 +77,39 @@ int mywrite(int fd, char *buf, int nbytes){
         int lbk   = oftp->offset / BLKSIZE;
         int start = oftp->offset % BLKSIZE;
 
+        /*Search for lbk in Direct, Indirect, and Double Indirect Blocks.
+        If lbk doesnt exist allocate a new block and write it back to disk.*/
         if(lbk < 12){  
             //DIRECT BLOCK
  
             if(mip->INODE.i_block[lbk] == 0){
-                //allocate DB if no DB
-                mip->INODE.i_block[lbk] = balloc(mip->dev); 
+                mip->INODE.i_block[lbk] = balloc(mip->dev); //allocate Direct DB
             }
-
-            //turn lbk to blk   
-            blk = mip->INODE.i_block[lbk]; 
+ 
+            blk = mip->INODE.i_block[lbk];  //turn lbk to blk   
         }
         else if(lbk >= 12 && lbk < 256+12){ 
             //INDIRECT BLOCK 
 
             if(mip->INODE.i_block[12] == 0){
-                //allocate new block
-                mip->INODE.i_block[12] = balloc(mip->dev);
+               
+                mip->INODE.i_block[12] = balloc(mip->dev);  //allocate i_block[12]
                 
                 //zero out entire indirect blocks
-                get_block(dev, mip->INODE.i_block[12],sbuf);
+                get_block(dev, mip->INODE.i_block[12],wbuf);
                 for(int i = 0; i < BLKSIZE; i++){
-                    sbuf[i] = 0;
+                    wbuf[i] = 0;
                 }
 
-                //write i_block[12] back to disk
-                put_block(mip->dev,mip->INODE.i_block[12], sbuf);
+                put_block(mip->dev,mip->INODE.i_block[12], wbuf); //write i_block[12] back to disk
             }
 
-            get_block(dev, mip->INODE.i_block[12],sbuf);
-            iptr = (int *)sbuf +lbk - 12;
+            //get indirect block at lbk
+            get_block(dev, mip->INODE.i_block[12],wbuf);
+            iptr = (int *)wbuf +lbk - 12;
             blk = *iptr;
 
-            //if DB doesnt exist yet, allocate it
+            //if blk doesnt exist yet, allocate it
             if(blk == 0){
                 blk = balloc(mip->dev);
             }
@@ -116,55 +118,80 @@ int mywrite(int fd, char *buf, int nbytes){
             //DOUBLE INDIRECT BLOCK
 
             if(mip->INODE.i_block[13] == 0){
-                //allocate new data block
-                mip->INODE.i_block[13] = balloc(mip->dev);
+                mip->INODE.i_block[13] = balloc(mip->dev); //allocate i_block[13]
 
-                //zero out entire 13th block
-                get_block(mip->dev,mip->INODE.i_block[13],sbuf);
+                //zero out entire i_block[13]
+                get_block(mip->dev,mip->INODE.i_block[13],wbuf);
                 for(int i = 0; i < BLKSIZE; i++){
-                    sbuf[i] = 0;
+                    wbuf[i] = 0;
                 }
 
-                //write i_lock[13] back to disk
-                put_block(mip->dev,mip->INODE.i_block[13],sbuf);
+                put_block(mip->dev,mip->INODE.i_block[13],wbuf);  //write i_block[13] back to disk
             }
 
-            get_block(mip->dev,mip->INODE.i_block[13],sbuf);
+            get_block(mip->dev,mip->INODE.i_block[13],wbuf);
 
             int ind_blk = (lbk - 268) / 256;      //get indirect blk num
             int ind_offset = (lbk - 268) % 256;   //get indirect blk offset
 
             //get ind_blk into blk
-            iptr = (int *)sbuf + ind_blk; 
+            iptr = (int *)wbuf + ind_blk; 
             blk = *iptr;                  
 
+            //if blk doesnt exist yet, allocate it
             if(blk == 0){
-                //no blk yet; so allocate blk
                 blk = balloc(mip->dev);
 
                 //zero entire ind_blk
-                get_block(mip->dev, blk, sbuf);
+                get_block(mip->dev, blk, wbuf);
                 for(int i = 0; i < BLKSIZE; i++){
-                    sbuf[i] = 0;
+                    wbuf[i] = 0;
                 }
 
                 //write ind_blk back to disk
-                put_block(mip->dev, blk, sbuf);
+                put_block(mip->dev, blk, wbuf);
             }
             
             //get ind_blk offset block
-            get_block(mip->dev, blk, sbuf);
-            iptr = (int *)sbuf + ind_offset;
+            get_block(mip->dev, blk, wbuf);
+            iptr = (int *)wbuf + ind_offset;
             blk = *iptr;
 
+            //allocate new blk; write back to disk
             if(blk == 0){
-                //allocate new blk; write back to disk
                 blk = balloc(mip->dev);
-                put_block(mip->dev, blk, sbuf);
+                put_block(mip->dev, blk, wbuf);
             }
         }
 
-        get_block(mip->dev, blk, sbuf);
+        /*
+            Write to the Data Block
+        */
+        get_block(mip->dev, blk, wbuf);    //read in disk block to wbuf[]
+        char *cp = wbuf + start;           //cp points to start byte in wbuf[]
+        int remaining = BLKSIZE - start;   //num of bytes remaining in disk block
 
+        while(remaining > 0){
+            //continue to write as long as remaining > 0
+            *cp++ = *cq++;
+
+            nbytes--;remaining--; //dec counts
+            oftp->offset++;       //advance offset
+
+            if(oftp->offset > mip->INODE.i_size){
+                mip->INODE.i_size++;
+            }
+            if(nbytes == 0){
+                break;
+            }
+        }
+
+        put_block(mip->dev, blk, wbuf); //write wbuf[] to disk
     }
+
+    //mark MINODE dirty for iput()
+    mip->dirty = 1;
+    printf("wrote %d char(s) into fred=%d\n",nbytes,fd);
+
+    return nbytes;
 }
