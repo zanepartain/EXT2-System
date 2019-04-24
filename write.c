@@ -1,4 +1,4 @@
-/************* write_cp.c file **************/
+/************* cp.c file **************/
 
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
