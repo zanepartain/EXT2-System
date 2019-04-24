@@ -106,6 +106,7 @@ int main(int argc, char *argv[ ])
       printf("magic = %x is not an ext2 filesystem\n", sp->s_magic);
       exit(1);
   }     
+  
   printf("OK\n");
   ninodes = sp->s_inodes_count;
   nblocks = sp->s_blocks_count;

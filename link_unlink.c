@@ -102,12 +102,17 @@ int unlink(){
         //get MINODE
         mip = iget(dev,ino);
         //(if MINODE is not a DIR)
-        if(dir_or_file(mip) != 1)  
+        if(!S_ISDIR(mip->INODE.i_mode))  
         {
             dirname_basename(dirname,basename); //get dirname & basename of mip
 
             //Get parent MINODE
-            pino = getino(dirname);
+            if(strlen(dirname) == 0){
+                pino = running->cwd->ino;
+            }
+            else{
+                pino = getino(dirname);
+            }
             pmip = iget(dev, pino);
 
             //remove child file from parent MINODE

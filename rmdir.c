@@ -53,7 +53,7 @@ int rm_child(MINODE *pmip, char *child_name){
     for (i=0; i < 12; i++){
 
       if(pmip->INODE.i_block[i] == 0){   //never found the dir name
-          return 0; 
+          continue; 
       }
 
       // YOU SHOULD print i_block[i] number here
