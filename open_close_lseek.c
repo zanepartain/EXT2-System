@@ -114,12 +114,12 @@ int open_file(char *file, char *mode_string){
 
     mode = get_mode(mode_string); //get mode
 
-    ino = getino(pathname); //get file inode#
+    ino = getino(file); //get file inode#
 
     if(ino == 0){
         //file doesnt exist; create new file; get inode#
-        creat_file(pathname);
-        ino = getino(pathname);
+        creat_file(file);
+        ino = getino(file);
     }
 
     mip = iget(dev,ino); //get MINODE of file

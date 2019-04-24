@@ -1,5 +1,5 @@
 /************* cp.c file **************/
-#include "type.h"
+
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
 extern MINODE *root;
@@ -27,7 +27,7 @@ int mycp(char *source, char *dest){
     int sino, dino;       //soucre & dest ino
     int lsfd, ldfd;       //source & dest fd
     int nbytes;           //number of bytes read from source
-    MINODE *smip, *dmip;   //source & dest MINODE's
+    MINODE *smip, *dmip;  //source & dest MINODE's
 
 
     /*Get the source MINODE. Verify it exists, and that it 
@@ -46,9 +46,8 @@ int mycp(char *source, char *dest){
         return;
     }
 
-    //open source file for READ ; READ entire file into sbuf[]
+    //open source file for READ
     lsfd = open_file(source, "R");  
-    nbytes = read_file(lsfd, sbuf, smip->INODE.i_size);
 
 
     /*Get the dest MINODE. If doesnt exist ten create it as REG FILE.
@@ -56,8 +55,9 @@ int mycp(char *source, char *dest){
     dino = getino(dest); 
 
     if(dino == 0){
-        creat_file(dest);        //create dest file
-        ldfd = open(dest, "W");  //open dest file for WRITE
+        creat_file(dest);      //create dest file
+        dino = getino(dest);   //get dest ino
+        dmip = iget(dev,dino); //get dest MINODE
     }
     else{
         //get dest MINODE and verify is REG FILE
@@ -66,7 +66,19 @@ int mycp(char *source, char *dest){
             printf("_err: (dest) %s is not a REG FILE\n", name[n-1]);
             return;
         }
-
-
     }
+
+    //open dest file for WRITE ; Write sbuf[] to dest file
+    ldfd = open_file(dest, "W");  
+
+    while(nbytes = read_file(lsfd, sbuf, BLKSIZE)){
+        mywrite(ldfd,sbuf,nbytes);
+    }
+
+    printf("copied source-fd=%d to dest-fd=%d\n", lsfd,ldfd);
+
+    close_file(lsfd);  //close source file
+    close_file(ldfd);  //close dest file
+
+    return 1;
 }

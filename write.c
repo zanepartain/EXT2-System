@@ -66,7 +66,7 @@ int write_file(){
  * to write the text buffer to the open fd.
  */
 int mywrite(int fd, char *buf, int nbytes){
-    char wbuf[BLKSIZE], *cq = buf;     //cq points at buf[]
+    char wbuf[BLKSIZE] = {""}, *cq = buf;     //cq points at buf[]
     int *iptr, blk, byte_count = 0;    //num bytes written to fd
     OFT *oftp = running->fd[fd];       //get OFT
     MINODE *mip = oftp->mptr;          //point to MINODE of OFT
@@ -194,6 +194,6 @@ int mywrite(int fd, char *buf, int nbytes){
     mip->dirty = 1;
     printf("wrote %d char(s) into fd=%d\n",byte_count,fd);
 
-    return nbytes;
+    return byte_count;
 }
 

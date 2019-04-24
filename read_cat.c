@@ -26,7 +26,7 @@ extern char   line[256], cmd[32], pathname[256];
 int read_file(int fd,char *buf, int nbytes){
     char sbuf[BLKSIZE], readbuf[BLKSIZE];
     int byte_count = 0, blk = -1;      //bytes read & blk number
-    char *cq = buf;                  //cbuf points to buf
+    char *cq = buf;                    //cbuf points to buf
     OFT *ofd = running->fd[fd];        //get open file descriptor
     MINODE *mip = ofd->mptr;           //get MINODE of open file descriptor
     
