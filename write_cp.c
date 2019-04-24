@@ -1,5 +1,5 @@
 /************* write_cp.c file **************/
-#include "type.h"
+
 /**** globals defined in main.c file ****/
 extern MINODE minode[NMINODE];
 extern MINODE *root;
@@ -177,6 +177,7 @@ int mywrite(int fd, char *buf, int nbytes){
 
             nbytes--;remaining--; //dec counts
             oftp->offset++;       //advance offset
+            byte_count++;
 
             if(oftp->offset > mip->INODE.i_size){
                 mip->INODE.i_size++;
@@ -191,7 +192,7 @@ int mywrite(int fd, char *buf, int nbytes){
 
     //mark MINODE dirty for iput()
     mip->dirty = 1;
-    printf("wrote %d char(s) into fred=%d\n",nbytes,fd);
+    printf("wrote %d char(s) into fd=%d\n",byte_count,fd);
 
     return nbytes;
 }

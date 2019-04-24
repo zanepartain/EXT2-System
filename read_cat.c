@@ -26,7 +26,7 @@ extern char   line[256], cmd[32], pathname[256];
 int read_file(int fd,char *buf, int nbytes){
     char sbuf[BLKSIZE], readbuf[BLKSIZE];
     int byte_count = 0, blk = -1;      //bytes read & blk number
-    char *cbuf = buf;                  //cbuf points to buf
+    char *cq = buf;                  //cbuf points to buf
     OFT *ofd = running->fd[fd];        //get open file descriptor
     MINODE *mip = ofd->mptr;           //get MINODE of open file descriptor
     
@@ -86,7 +86,7 @@ int read_file(int fd,char *buf, int nbytes){
         int remaining = BLKSIZE - start;
 
         while(remaining > 0){
-            *cbuf = *cp++;     //copy byte from readbuf[] into buf[]
+            *cq++ = *cp++;     //copy byte from readbuf[] into buf[]
             ofd->offset++;     //advance offset
             byte_count++;      //inc byte count
             available--;       //dec the following
@@ -104,6 +104,10 @@ int read_file(int fd,char *buf, int nbytes){
 }
 
 
+/**
+ * Print the contents a FILE given the pathname. If the file DNE, it
+ * will create the file and print nothing as the contents will be empty.
+ */
 int cat_file(char *file){
     char mybuf[BLKSIZE], dummy = 0; //mybuf[] and null char
     int n;
@@ -113,8 +117,16 @@ int cat_file(char *file){
     while(n = read_file(lfd,mybuf,BLKSIZE)){
         //print null terminated string
         mybuf[n] = 0;
-        printf("%s",mybuf);
+        
+        int i = 0;
+        while(mybuf[i]){
+            putchar(mybuf[i]);
+            if(mybuf[i] == '\n'){
+                putchar('\n');
+            }
+            i++;
+        }
     }
-
+    putchar('\n');
     close_file(lfd);
 }

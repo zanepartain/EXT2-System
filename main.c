@@ -182,7 +182,9 @@ int main(int argc, char *argv[ ])
    if (strcmp(cmd,"close")==0)
        close_file(fd);
    if (strcmp(cmd,"read")==0)
-       read_file(fd,buf,1024); 
+       read_file(fd,buf,1024);
+   if (strcmp(cmd,"cat")==0)
+       cat_file(pathname); 
    if(strcmp(cmd,"write") == 0)
        write_file();
 
