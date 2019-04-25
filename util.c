@@ -564,14 +564,18 @@ int printMINODE(MINODE *mip){
 }
 
 /*Print contents of an OFT*/
-int printOFT(OFT oftp){
-
-    printf("--------- OFT --------\n");
-    printf("mptr: %d rc:%d    ", oftp.mptr->ino, oftp.mptr->refCount);
-    printf("mode: %d    ", oftp.mode);
-    printf("offset: %d  ", oftp.offset);
-    printf("refCount: %d \n", oftp.refCount);
-    printf("----------------------\n");
+int printOFT(){
+    int i = 0;
+    while(running->fd[i] != 0){
+        OFT *oftp = running->fd[i];
+        printf("--------- OFT --------\n");
+        printf("mptr:%d  dev:%d  rc:%d    |", oftp->mptr->ino, oftp->mptr->dev, oftp->mptr->refCount);
+        printf("mode: %d    |", oftp->mode);
+        printf("offset: %d  |", oftp->offset);
+        printf("refCount: %d \n", oftp->refCount);
+        printf("----------------------\n");
+        i++;
+    }
 
 }
 

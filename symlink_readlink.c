@@ -123,6 +123,7 @@ int readlink(char *file, char *buffer){
             //copy dp name to buffer
             strncpy(buffer, dp->name, dp->name_len);
             buffer[dp->name_len] = 0;
+            printf("target name=%s\n",buffer);
         }
     }
     else{

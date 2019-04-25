@@ -96,13 +96,13 @@ int ls_file(int ino, char *fname){
   printf("%s", basename(fname)); // print file basename
 
  
-  
+  /*
   if (S_ISLNK(ip->i_mode)){   // print -> linkname if symbolic file
     char lname[128];
     readlink(fname,lname);
     printf(" -> %s", lname); // print linked name
   }
-
+  */
   iput(mip);
   printf("\n");
 }
@@ -128,6 +128,9 @@ int ls_dir(MINODE *mip){
       temp[dp->name_len] = 0;                 //ensure null at end
       if(strlen(temp) > 0){
         ls_file(dp->inode, temp);
+      }
+      else{
+        return;
       }
     } 
     strcpy(prev_name,temp);
