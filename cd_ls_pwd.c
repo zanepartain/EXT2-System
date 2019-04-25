@@ -96,12 +96,13 @@ int ls_file(int ino, char *fname){
   printf("%s", basename(fname)); // print file basename
 
  
-  /*        NOT WORKING
-  if ((ip->i_mode & 0xF000)== 0xA000){   // print -> linkname if symbolic file
-    // use readlink() to read linkname
-    printf(" -> %s", linkname); // print linked name
+  
+  if (S_ISLNK(ip->i_mode)){   // print -> linkname if symbolic file
+    char lname[128];
+    readlink(fname,lname);
+    printf(" -> %s", lname); // print linked name
   }
-  */
+
   iput(mip);
   printf("\n");
 }
@@ -112,7 +113,7 @@ List (print) the stats of every FILE or DIR in the passed
 in DataBlock (MINODE)
 */
 int ls_dir(MINODE *mip){
-  char sbuf[BLKSIZE], temp[256];
+  char sbuf[BLKSIZE], temp[256], prev_name[256];
   char *cp;
   get_block(dev,mip->INODE.i_block[0], sbuf);  //get dir entry
 
@@ -125,10 +126,11 @@ int ls_dir(MINODE *mip){
     {
       strncpy(temp, dp->name, dp->name_len);  //make name a string and save into temp
       temp[dp->name_len] = 0;                 //ensure null at end
-
-      ls_file(dp->inode, temp);
+      if(strlen(temp) > 0){
+        ls_file(dp->inode, temp);
+      }
     } 
-
+    strcpy(prev_name,temp);
     cp += dp->rec_len;   //advance cp by rec_len
     dp = (DIR *)cp;      //pull dp to next entry
   }

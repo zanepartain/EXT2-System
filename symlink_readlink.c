@@ -22,10 +22,11 @@ extern char   line[256], cmd[32], pathname[256], sourcepath[256];
  * Creates symbolic link from a new file to an old file
  */
 int symlink(){
-    int old_ino, pino, old_pino;
+    int old_ino, pino = 0, old_pino;
     char new_dirname[256]={""},new_basename[120]={""};  //new file dirname & basename
     char old_dirname[256]={""},old_basename[120]={""};  //old file dirname & basename
     char old_name[120] = {""};
+    char sbuf[BLKSIZE];
     MINODE *old_mip, *new_mip, *new_pmip;
 
     //get old file inode#
@@ -50,14 +51,29 @@ int symlink(){
             new_mip = iget(dev,new_ino);   
             new_mip->INODE.i_mode = LNK;
             
-            enter_name(new_mip, old_ino,old_basename); //store old file name in new file
+            new_mip->INODE.i_size = strlen(old_basename);
+            new_mip->INODE.i_block[0] = balloc(dev);
+            get_block(dev, new_mip->INODE.i_block[0],sbuf);
+
+            dp = (DIR *)sbuf;
+
+            dp->rec_len = strlen(old_basename);
+            dp->name_len = strlen(old_basename);
+            dp->inode = 0;
+            strcpy(dp->name, old_basename);
             
+            put_block(dev, new_mip->INODE.i_block[0],sbuf);
             //write back new MINODE
             new_mip->dirty = 1;
             iput(new_mip);
 
             //get new parent MINODE & mark dirty, then write back
-            pino = getino(new_dirname);
+            if(strlen(new_dirname) == 0){
+                pino = running->cwd->ino;
+            }
+            else{
+                pino = getino(new_dirname);
+            }
             new_pmip = iget(dev, pino);
             new_pmip->dirty = 1;
 
@@ -91,7 +107,6 @@ int readlink(char *file, char *buffer){
 
     //verify mip is symlink
     if(dir_or_file(mip) == 2){
-        printf("%s IS SYMLINK\n", basename);
 
         //search INODE data blocks for target name
         for(i = 0; i < 12; i ++){
@@ -105,18 +120,9 @@ int readlink(char *file, char *buffer){
             dp = (DIR *)sbuf;
             cp = sbuf;
 
-            while(cp < sbuf + BLKSIZE){
-                if(strcmp(dp->name,".") != 0 && strcmp(dp->name,"..") != 0){
-                    //copy dp name to buffer
-                    strncpy(buffer, dp->name, dp->name_len);
-                    buffer[dp->name_len] = 0;
-
-                    printf("target name = %s\n", buffer);
-                }
-
-                cp += dp->rec_len;  //advance cp & dp
-                dp = (DIR *)cp;
-            }
+            //copy dp name to buffer
+            strncpy(buffer, dp->name, dp->name_len);
+            buffer[dp->name_len] = 0;
         }
     }
     else{

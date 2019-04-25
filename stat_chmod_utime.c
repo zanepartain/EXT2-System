@@ -51,14 +51,26 @@ struct stat my_stat(char *filepath){
  * change the MINODE mode to an executable file
  */
 int my_chmod(char *filepath){
-    int ino;
+    int ino, mode = 0;
     MINODE *mip;
 
     //get MINODE of file
     ino = getino(filepath);
-    mip = iget(dev,ino);
 
-    mip->INODE.i_mode |=  0x1A4;
+    if(ino){
+        mip = iget(dev,ino);
+    }
+    else{
+        printf("_err: %s file DNE\n", name[n-1]);
+        return;
+    }
+
+    //convert string from sourcepath to octal rep
+    mode = (int)strtol(sourcepath, (char **)NULL,8);
+
+    //clear old mode and write new permissions
+    mip->INODE.i_mode = (mip->INODE.i_mode & 0xF000);
+    mip->INODE.i_mode |= mode;
     mip->dirty = 1;
 
     iput(mip); //write MINODE back

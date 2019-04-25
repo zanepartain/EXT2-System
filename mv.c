@@ -38,6 +38,7 @@ int mymv(char *source, char *dest){
 
     smip = iget(dev,sino); //source MINODE
 
+    //append source basename to destination
     strcat(dest,"/");
     strcat(dest,name[n-1]);
 

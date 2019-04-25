@@ -56,7 +56,7 @@ MINODE *iget(int dev, int ino)
     mip = &minode[i];
     if (mip->dev == dev && mip->ino == ino){
        mip->refCount++;
-       printf("found [%d %d] as minode[%d] in core\n", dev, ino, i);
+       //printf("found [%d %d] as minode[%d] in core\n", dev, ino, i);
        return mip;
     }
   }
@@ -169,7 +169,7 @@ int getino(char *pathname)
   INODE *ip;
   MINODE *mip;
 
-  printf("getino: pathname=%s\n", pathname);
+  //printf("getino: pathname=%s\n", pathname);
   if (strcmp(pathname, "/")==0)
       return 2;
 
@@ -181,7 +181,7 @@ int getino(char *pathname)
   tokenize(pathname);
 
   for (i=0; i<n; i++){
-      printf("===========================================\n");
+      //printf("===========================================\n");
       ino = search(mip, name[i]);
 
       if (ino==0){
