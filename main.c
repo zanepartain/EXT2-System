@@ -40,6 +40,7 @@ char   line[256], cmd[32], pathname[256], sourcepath[256];
 #include "write.c"
 #include "cp.c"
 #include "mv.c"
+#include "menu.c"
 
 
 int init()
@@ -142,7 +143,7 @@ int main(int argc, char *argv[ ])
 
   //printf("hit a key to continue : "); getchar();
   while(1){
-    printf("input command : [ls|cd|pwd|mkdir|rmdir|creat|link|unlink|symlink|readlink|quit] ");
+    printf("input command : ");
     fgets(line,128,stdin);
     line[strlen(line)-1] = 0; 
     if (line[0]==0)
@@ -196,6 +197,8 @@ int main(int argc, char *argv[ ])
        mycp(pathname,sourcepath);
    if(strcmp(cmd,"mv") == 0)
        mymv(pathname,sourcepath);
+   if(strcmp(cmd,"menu") == 0)
+       menu();
 
     if (strcmp(cmd, "quit")==0)
        quit();
