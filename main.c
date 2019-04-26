@@ -83,7 +83,7 @@ int mount_root()
 }
 
 
-char *disk = "mydisk";
+char *disk = "diskimage";
 int main(int argc, char *argv[ ])
 {
   int ino;
@@ -163,6 +163,8 @@ int main(int argc, char *argv[ ])
        change_dir();
     if (strcmp(cmd, "pwd")==0)
        pwd(running->cwd);
+    if (strcmp(cmd, "touch")==0)
+       mytouch();
     if (strcmp(cmd,"mkdir")==0)
        make_directory();
     if (strcmp(cmd,"creat")==0)

@@ -103,7 +103,7 @@ iput(MINODE *mip)
  if (!mip->dirty)       return;
  
  /* write back */
- printf("iput: dev=%d ino=%d\n", mip->dev, mip->ino); 
+ //printf("iput: dev=%d ino=%d\n", mip->dev, mip->ino); 
 
  block =  ((mip->ino - 1) / 8) + inode_start;
  offset =  (mip->ino - 1) % 8;

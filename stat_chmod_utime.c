@@ -75,3 +75,29 @@ int my_chmod(char *filepath){
 
     iput(mip); //write MINODE back
 }
+
+
+/**
+ * Touch the specified file by pathname, and update its timestamp
+ * to a current timestamp
+ */
+int mytouch(){
+    int ino;
+    MINODE *mip;
+
+    ino = getino(pathname); //get file ino#
+
+    if(ino == 0){
+        printf("_err: file DNE\n");
+        return;
+    }
+
+    mip = iget(dev,ino); //get MINODE by ino#
+
+    //change mip date and time to current time
+    mip->INODE.i_atime = mip->INODE.i_ctime = mip->INODE.i_mtime = time(0L);
+
+    //mark dirty and write mip back
+    mip->dirty = 1;
+    iput(mip);
+}

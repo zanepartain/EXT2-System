@@ -24,5 +24,4 @@ void menu(){
     printf("[ls|cd|pwd|mkdir|rmdir|creat|link|unlink|symlink|readlink|\n");
     printf(" stat|chmod|open|close|read|cat|pfd|cp|mv|quit]\n");
     printf("------------------------------------------------------------\n");
-
 }
